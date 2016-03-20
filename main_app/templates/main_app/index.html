@@ -2,36 +2,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
-	<!-- <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet"> -->
-	<title>ABCDEFG</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    <!-- <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet"> -->
+    <title>ABCDEFG</title>
 </head>
 <body>
 <h1>PUT YOUR HAND UP !</h1>
 <div class="row">
-	<div class="col-md-6">
-		
-		<button class="btn-danger">ABCD</button>
-	</div>
-	<div class="col-md-6">
-		<button class="btn-warning">ABCD</button>
-		<form enctype="multipart/form-data" method="post" action="/main/upload/">
-		<!-- 	{{ form.title }}
-			{{ form.file  }}
-		 -->
-		{% for field in form %}
-            <div class="fieldWrapper">
-                {% csrf_token %}
-        		{{ field.errors }}
-                {{ field.label_tag }} {{ field }}
-    			{% if field.help_text %}
-        			<p class="help">{{ field.help_text|safe }}</p>
-                {% endif %}
-            </div>
-        {% endfor %}
-                <input type="submit" class="submit-post">   
-</form>
-	</div>	
+    <div class="col-md-6">
+        <button class="btn-danger">ABCD</button>
+    </div>
+    <div class="col-md-6">
+        <button class="btn-warning">ABCD</button>
+        <form enctype="multipart/form-data" method="post" action="/main/upload/">
+        <!-- 	{{ form.title }}
+            {{ form.file  }}
+        -->
+            {% for field in form %}
+                <div class="fieldWrapper">
+                    {% csrf_token %}
+                    <!-- {{ field.errors }} -->
+                    {{ field.label_tag }} {{ field }}
+                    {% if field.help_text %}
+                       <p class="help">{{ field.help_text|safe }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <input type="submit" class="submit-post">
+        </form>
+    </div>	
 </div>
 </body>
 </html>

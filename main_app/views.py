@@ -9,12 +9,13 @@ def index(request):
 
 def upload(request):
     if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
+        form = UploadFileForm(request.POST, request.POST, request.FILES, request.FILES)
         if form.is_valid():
-            handle_uploaded_file(request.FILES['file'])
+            handle_uploaded_file(request.FILES['video_file'])
+            handle_uploaded_file(request.FILES['weight_file'])
             return HttpResponse("success")
         else:
-        	return HttpResponse("Invalid")
+        	return HttpResponse("invalid")
     else:
         form = UploadFileForm()
     	return HttpResponse("failed")
