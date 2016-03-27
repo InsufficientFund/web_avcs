@@ -13,6 +13,7 @@ import glob
 import re
 import csv
 import os
+import uuid
 
 def index(request):
     form = UploadFileForm()
@@ -23,8 +24,8 @@ def upload(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_file(request.FILES['file'])
-            return HttpResponse("success")
+            filename = handle_uploaded_file(request.FILES['file'])
+            return HttpResponse(filename)
         else:
             return HttpResponse("Invalid")
     else:
@@ -37,9 +38,12 @@ def upload(request):
 # Create your views here.
 
 def handle_uploaded_file(f):
-    with open(settings.MEDIA_ROOT+"upload/"+f.name, 'wb+') as destination:
+    ext = f.name.split('.')[-1]
+    filename = "%s.%s" % (uuid.uuid4(), ext)
+    with open(settings.MEDIA_ROOT+"upload/"+filename, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+    return filename
 
 
 def get_image(request):
@@ -218,10 +222,20 @@ def predict_page(request):
         return render(request, 'main_app/predict_page.html',  {'form': form})
         #return render(request, 'main_app/index.html', {'form': form})
 
-def get_sample_video(request):
+
+def get_sample_frame(request):
     if request.is_ajax():
         if request.method == 'GET':
-            return HttpResponse('train_image_1/sample/sample.png')
+            filename = request.GET['video_name']
+            counter = AVCS()
+            counter.readVideo(settings.MEDIA_ROOT+"upload/"+filename)
+            #import ipdb; ipdb.set_trace()
+            frame = counter.sampleImage()
+            frame_name = filename[:filename.find('.avi')] + '.png'
+            write_path = '/home/sayong/Project/web_avcs/static/main_app/media/sample_image/'+frame_name
+            cv2.imwrite(write_path, frame)
+            return HttpResponse('sample_image/'+frame_name)
+
 
 def predict(request):
     if request.is_ajax():
@@ -230,7 +244,7 @@ def predict(request):
             json_data = json.loads(request.body)
             print json_data
             counter = AVCS()
-            video_path = '/home/sayong/Project/web_avcs/static/main_app/media/train_video/' + json_data['video_name']
+            video_path = '/home/sayong/Project/web_avcs/media/upload/' + json_data['video_name']
             print video_path
             counter.readVideo(video_path)
             # counter.addLane((131, 142), (203, 142), (123, 245), (213, 245))

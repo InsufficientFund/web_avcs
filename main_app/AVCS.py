@@ -53,8 +53,7 @@ class AVCS:
             self.video.set(cv2.cv.CV_CAP_PROP_POS_MSEC, 0)
             ret, self.sampleFrame = self.video.read()
         if ret:
-            cv2.imshow('frame', self.sampleFrame)
-            cv2.waitKey(0)
+            return self.sampleFrame
 
     def writeClusters(self, data, members):
         dataF = open('data.csv', 'a')

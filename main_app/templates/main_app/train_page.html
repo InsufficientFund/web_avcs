@@ -1,0 +1,217 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Bootstrap 101 Template</title>
+
+    <!-- Bootstrap -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+  {% csrf_token %}
+    <div><input type="text" id="video_name"></div>
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+      Launch demo modal
+    </button>
+    <!-- Modal -->
+    <div class="modal fade bs-example-modal-lg" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+          </div>
+          <div class="modal-body">
+                <form name="pointform" method="post">
+    <!--<div id="pointer_div" onclick="point_it(event)" style = "background-image:url({{img}});width:500px;height:333px;">-->
+      <div id="pointer_div" onclick="point_it(event)" style = "background-image:url('{% static 'main_app/media/tesf.png' %}');width:640px;height:480px;">
+        <!--<img src="{% static 'main_app/media/tesf.png' %}" id="cross" >-->
+      <img  id="cross" style="position:relative;visibility:hidden;z-index:2;"></div>
+      You pointed on x = <input type="text" id="up_left_x"  name="up_left_x" size="4" /> - y =    <input type="text" id="up_left_y"  name="up_left_y" size="4" /><br>
+      You pointed on x = <input type="text" id="up_right_x"  name="up_right_x" size="4" /> - y =  <input type="text" id="up_right_y"  name="up_right_y" size="4" /><br>
+      You pointed on x = <input type="text" id="low_left_x"  name="low_left_x" size="4" /> - y =  <input type="text" id="low_left_y"  name="low_left_y" size="4" /><br>
+      You pointed on x = <input type="text" id="low_right_x" name="low_right_x" size="4" /> - y = <input type="text" id="low_right_y" name="low_right_y" size="4" />
+    </form>
+    <div id="pos_select" hidden>0</div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="add_lane(event)">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#setCarModal">
+      show data learn
+    </button>
+    <!-- Modal -->
+    <div class="modal fade bs-example-modal-lg" id="setCarModal" tabindex="-1" role="dialog" aria-labelledby="setCarModalLabel">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="setCarModalLabel">Modal title</h4>
+          </div>
+          <div class="modal-body">
+            <div id="cars_image">
+
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="send_select(event)">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="test_ajax" >2</div>
+    <button type="button" class="btn btn-primary" onclick="send_train(event)">send</button>
+    <button type="button" class="btn btn-success" onclick="train_cmd(event)">train</button>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery.form.min.js' %}"></script>
+  <script language="JavaScript">
+
+// using jQuery
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+var csrftoken = getCookie('csrftoken');
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+        }
+    }
+});
+function send_train(event){
+    var json_data = {}
+    json_data["data"] = sessionStorage.getItem('lane');
+    json_data["video_name"] = $("#video_name").val();
+    $.ajax({
+    url: "/main/car_detect/",
+    type: "POST",
+    data: JSON.stringify(json_data),//JSON.stringify(sessionStorage.getItem('lane')),
+    contentType: "application/json",
+    success:function(data) {
+      $("#cars_image").html(data);
+    },
+    });
+}
+
+function send_select(event){
+    console.log('send');
+    var formData = $("#select_form").serializeArray();
+    $.post('/main/imp_data/', JSON.stringify(formData)).done(function (data) {
+        $("#cars_image").html('');
+        alert(data);
+    });
+}
+
+function train_cmd(event){
+    console.log('train');
+    $.ajax({
+      url: '/main/train/'
+    }).done(function(data) {
+      alert(data);
+    });
+    }
+
+function point_it(event){
+	pos_x = event.offsetX?(event.offsetX):event.pageX-document.getElementById("pointer_div").offsetLeft;
+	pos_y = event.offsetY?(event.offsetY):event.pageY-document.getElementById("pointer_div").offsetTop;
+	document.getElementById("cross").style.left = (pos_x-1) ;
+	document.getElementById("cross").style.top = (pos_y-15) ;
+	document.getElementById("cross").style.visibility = "visible" ;
+	console.log($("#pos_select").html() );
+	if ($("#pos_select").html() == '0'){
+	    document.pointform.up_left_x.value = pos_x;
+	    document.pointform.up_left_y.value = pos_y;
+	    $("#pos_select").html('1');
+	}
+	else if ($("#pos_select").html() == '1'){
+	    document.pointform.up_right_x.value = pos_x;
+	    document.pointform.up_right_y.value = pos_y;
+	    $("#pos_select").html('2');
+	}
+	else if ($("#pos_select").html() == '2'){
+	    document.pointform.low_left_x.value = pos_x;
+	    document.pointform.low_left_y.value = pos_y;
+	    $("#pos_select").html('3');
+	}
+	else if ($("#pos_select").html() == '3'){
+	    document.pointform.low_right_x.value = pos_x;
+	    document.pointform.low_right_y.value = pos_y;
+	    $("#pos_select").html('0');
+	}
+}
+
+function add_lane(event){
+    var ulx = $("#up_left_x").val();
+    var urx = $("#up_right_x").val();
+    var llx = $("#low_left_x").val();
+    var lrx = $("#low_right_x").val();
+
+    var uly = $("#up_left_y").val();
+    var ury = $("#up_right_y").val();
+    var lly = $("#low_left_y").val();
+    var lry = $("#low_right_y").val();
+
+    var laneObj ={};
+    laneObj["up_left"  ] = [ulx, uly];
+    laneObj["up_right" ] = [urx, ury];
+    laneObj["low_left" ] = [llx, lly];
+    laneObj["low_right"] = [lrx, lry];
+
+
+    if(typeof Storage !== "undefined") {
+        if (sessionStorage.getItem('lane')) {
+            var lane = JSON.parse(sessionStorage.getItem("lane"));
+            lane.push(laneObj);
+            sessionStorage.setItem('lane', JSON.stringify(lane));
+        } else {
+            var lane = [];
+            lane.push(laneObj);
+            sessionStorage.setItem('lane', JSON.stringify(lane));
+        }
+    }
+}
+</script>
+  </body>
+</html>
