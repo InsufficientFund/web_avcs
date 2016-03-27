@@ -23,7 +23,7 @@ class neural_net:
         self.training_answer = None
         self.testing_data = None
         self.testing_answer = None
-        self.sess = None
+        self.sess = tf.Session()
 
     def init_weights(self,shape):
         return tf.Variable(tf.random_normal(shape, stddev=0.01))
@@ -49,11 +49,14 @@ class neural_net:
             for start, end in zip(range(0, len(self.training_data), 128), range(128, len(self.training_data), 128)):
                 self.sess.run(self.train_op, feed_dict={self.data_placeholder: self.training_data[start:end],
                                                         self.answer_placeholder: self.training_answer[start:end]})
-            print i, np.mean(np.argmax(self.testing_answer, axis=1) ==
-                             self.sess.run(self.predict_op, feed_dict={self.data_placeholder: self.testing_data,
-                                                                       self.answer_placeholder: self.testing_answer}))
+            print i, np.mean(np.argmax(self.training_answer, axis=1) ==
+                             self.sess.run(self.predict_op, feed_dict={self.data_placeholder: self.training_data,
+                                                                       self.answer_placeholder: self.training_answer}))
+            # print i, np.mean(np.argmax(self.testing_answer, axis=1) ==
+            #                  self.sess.run(self.predict_op, feed_dict={self.data_placeholder: self.testing_data,
+            #                                                            self.answer_placeholder: self.testing_answer}))
 
-    def data_input(self, data_file, type_set="train"):
+    def file_input(self, data_file, type_set="train"):
         df = pd.io.parsers.read_csv(
             filepath_or_buffer=data_file,
             header=None,
@@ -71,9 +74,22 @@ class neural_net:
         if type_set == "train":
             self.training_data = np.array(data.tolist(), dtype=np.float32)
             self.training_answer = np.array(answerList)
-        elif type_set == "test" :
+        elif type_set == "test":
             self.testing_data = np.array(data.tolist(), dtype=np.float32)
             self.testing_answer = np.array(answerList)
+
+    def data_input(self, data, answer, type_set="train"):
+        answer_list = [[0]*3 for x in range(len(answer))]
+        for x in range(len(answer_list)):
+            answer_list[x][int(answer[x])] = 1
+        if type_set == "train":
+            self.training_data = np.array(data, dtype=np.float32)
+            self.training_data = preprocessing.scale(self.training_data, axis=0, with_mean=True, with_std=True, copy=False)
+            self.training_answer = np.array(answer_list)
+        elif type_set == "test":
+            self.testing_data = np.array(data, dtype=np.float32)
+            self.testing_data = preprocessing.scale(self.testing_data, axis=0, with_mean=True, with_std=True, copy=False)
+            self.testing_answer = np.array(answer_list)
 
     def accuracy_info(self):
         answerListB = self.testing_answer.tolist()
@@ -87,7 +103,24 @@ class neural_net:
         print cm
         print acc
 
+    def predict(self, data):
+        np_data = np.array(data, dtype=np.float32)
+        answer = self.sess.run(self.predict_op, feed_dict={self.data_placeholder: np.array([np_data])})
+        return answer[0]
 
+    def get_train_data(self):
+        return self.training_data, self.training_answer
+
+    def get_test_data(self):
+        return self.testing_data, self.testing_answer
+
+    def save_model(self):
+        saver = tf.train.Saver()
+        saver.save(self.sess, '/home/sayong/Project/web_avcs/static/main_app/media/model.ckpt')
+
+    def load_model(self):
+        saver = tf.train.Saver()
+        saver.restore(self.sess, '/home/sayong/Project/web_avcs/static/main_app/media/model.ckpt')
 
 # def init_weights(shape):
 #     return tf.Variable(tf.random_normal(shape, stddev=0.01))

@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 from copy import deepcopy
 import math
+import os
+from lbp_feature import lbp_feature
+from neural_net import neural_net
 
 class AVCS:
     """docstring for ClassName"""
@@ -65,25 +68,21 @@ class AVCS:
         res = cv2.convertScaleAbs(avg)
         return res
 
-    def run(self, cntStatus = True, saveVid = False, showVid = True ):
+    def run(self, mode,  cntStatus = True, saveVid = False, showVid = True ):
+        lbp = lbp_feature()
+        neural_network = neural_net(75, 3)
+        neural_network.create_struct(150)
+        neural_network.load_model()
         self.video.set(cv2.cv.CV_CAP_PROP_POS_MSEC, 0)
         kernel = np.ones((10, 10), np.uint8)
-        fourcc = cv2.cv.CV_FOURCC(*'XVID')
-        #vidWriter = cv2.VideoWriter('/home/sayong/videos.avi', fourcc, 15, (640, 480))
-
-        avg = np.float32(self.sampleFrame)
-
         lanes = [[] for x in range(self.totalLane)]
-
         totalCars = [0] * self.totalLane
         dataPlot = []
-        test = None
+        num_car_detect = 0
         while self.video.isOpened():
             ret, frame = self.video.read()
             if not ret:
                 break
-            bgFrame = self.getBackground(frame, avg)
-            cv2.imshow('background', bgFrame)
             frameOrigin = deepcopy(frame)
             res = frame
 
@@ -95,7 +94,6 @@ class AVCS:
                 self.fgMask = self.subtractor.apply(filteredFrame, -1)
                 test = deepcopy(self.fgMask)
             self.fgMask = self.subtractor.apply(filteredFrame, self.fgMask, -1)
-            #test = deepcopy(self.fgMask)
             self.fgMask = cv2.dilate(self.fgMask, kernel, iterations=1)
             self.fgMask = cv2.erode(self.fgMask, kernel, iterations=1)
 
@@ -162,9 +160,21 @@ class AVCS:
                         # grayImg = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
                         # normalImage = cv2.resize(grayImg, (64, 64))
                         equ = cv2.equalizeHist(grayImg)
+                        num_car_detect += 1
+                        if mode == 'train':
+                            directory = '/home/sayong/Project/web_avcs/static/main_app/media/train_image_1/'
+                            if not os.path.exists(directory):
+                                os.makedirs(directory)
+                            #cv2.imwrite(directory+'lane'+str(numLane + 0)+str(totalCars[numLane])+'.png', equ)
+                            cv2.imwrite(directory + 'car'+str(num_car_detect)+'.png', crop_img)
+                        if mode == 'predict':
+                            height, width, channels = crop_img.shape
+                            size_data = [height/100.0, width/100.0, height * width/10000.0]
+                            lbp.read_image(normalImage)
+                            feature = lbp.extract_feature(size_data[0], size_data[1], size_data[2])
+                            answer = neural_network.predict(feature)
+                            print answer
 
-                        #cv2.imwrite('/home/sayong/carData/lane'+str(numLane + 0)+str(totalCars[numLane])+'.png', equ)
-                        #cv2.imwrite('/home/sayong/carData/car1/lane'+str(numLane + 0)+str(totalCars[numLane])+'.png', crop_img)
                         lanes[numLane].remove(foundedObj)
 
                 for i in lanes[numLane]:
@@ -232,7 +242,6 @@ class AVCS:
             if showVid:
                 resMask = cv2.bitwise_and(frame, frame, mask=~self.fgMask)
                 cv2.imshow('frame', res)
-                #vidWriter.write(res)
                 if cv2.waitKey(5) & 0xFF == ord('q'):
                     cv2.imwrite('tesf.png', frameOrigin)
                     cv2.imwrite('tesM.png', self.fgMask)
@@ -240,32 +249,5 @@ class AVCS:
 
         print totalCars
         self.video.release()
-        #vidWriter.release()
         cv2.destroyAllWindows()
         print self.typeCar
-        # totalAtr = np.array(self.sizeCar[0] + self.sizeCar[1])
-        # k_means = KMeans(init='k-means++', n_clusters=3, n_init=10)
-        # k_means.fit(totalAtr)
-        # k_means_labels = k_means.labels_
-        # k_means_cluster_centers = k_means.cluster_centers_
-        # k_means_labels_unique = np.unique(k_means_labels)
-        # colors = ['#4EACC5', '#FF9C34', '#4E9A06']
-        # plt.figure()
-        #
-        # plt.hold(True)
-        # for k, col in zip(range(3), colors):
-        #     members = k_means_labels == k
-        #     cluster_center = k_means_cluster_centers[k]
-        #     plt.plot(totalAtr[members, 0], totalAtr[members, 1], 'w',
-        #              markerfacecolor=col, marker='.')
-        #     plt.plot(cluster_center[0], cluster_center[1], 'o', markerfacecolor=col,
-        #              markeredgecolor='k', markersize=6)
-        # plt.title('KMeans')
-        # plt.grid(True)
-        # plt.show()
-        # print dataPlot
-        # members = []
-        # for cluster in range(3):
-        #     member = k_means_labels == cluster
-        #     members.append(member)
-        # self.writeClusters(totalAtr, members)

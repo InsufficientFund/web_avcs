@@ -47,11 +47,11 @@ class lbp_feature:
         self.image = None
         self.feature_list = []
 
-    def read_image(self,image):
-        self.image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    def read_image(self, image):
+        self.image = cv2.equalizeHist(cv2.cvtColor(image, cv2.COLOR_BGR2GRAY))
         self.feature_list = []
 
-    def extract_feature(self, height, width, area):
+    def extract_feature(self, height, width, area, answer=None):
         hist_ratio = []
         hist_max = []
         for i in self.list_range:
@@ -61,7 +61,10 @@ class lbp_feature:
                 histR = hist[0:5].sum()/hist[5:10].sum()
                 hist_ratio.append(round(histR, 6))
                 hist_max.append(round(hist.max(), 6))
-        return np.hstack((hist_ratio, hist_max, height, width, area))
+        if answer == None:
+            return np.hstack((hist_ratio, hist_max, height, width, area))
+        else:
+            return np.hstack((hist_ratio, hist_max, height, width, area, answer))
 
 # lbpClass = LocalBinaryPatterns(8, 1)
 # listFile = glob.glob("/home/sayong/Project/Source/carData/car/*.png")
