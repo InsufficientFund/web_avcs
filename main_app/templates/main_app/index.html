@@ -8,24 +8,39 @@
 
      <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular.min.js"></script>
     <!-- <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet"> -->
+    <script>
+        var app = angular.module("MainApp", []);
+        app.config(function($interpolateProvider){
+        $interpolateProvider.startSymbol('{-').endSymbol('-}');
+        });
+        app.controller('MainController', ['$scope', '$http', function($scope,$http) {
+            $scope.title = 'Top Sellers in Books';
+            $scope.test_api_call = function(){
+                $http({method:'GET', url:'test_api/'})
+                .then(function(response){
+                    debugger;
+                });
+                debugger;
+            };
+        }]);
+     </script>
+
     <title>ABCDEFG</title>
 </head>
-<body>
+<body ng-app="MainApp">
 <h1>PUT YOUR HAND UP !</h1>
-<div class="row">
-    <div class="col-md-6">
+<div class="main" ng-controller="MainController">
+    <div class="row">
+        <div class="col-md-6">
         <button class="btn-danger">ABCD</button>
     </div>
-    <div class="col-md-6">
+    <div class="col-md-6 container">
         <button class="btn-warning">ABCD</button>
+                <h1>this is title : {-title-}</h1>
         <form enctype="multipart/form-data" method="post" action="/main/upload/">
-        <!-- 	{{ form.title }}
-            {{ form.file  }}
-        -->
             {% for field in form %}
                 <div class="fieldWrapper">
                     {% csrf_token %}
-                    <!-- {{ field.errors }} -->
                     {{ field.label_tag }} {{ field }}
                     {% if field.help_text %}
                        <p class="help">{{ field.help_text|safe }}</p>
@@ -34,6 +49,8 @@
             {% endfor %}
             <input type="submit" class="submit-post">
         </form>
+        <button ng-click="test_api_call()">test_api_call</button>
+    </div>
     </div>
 </div>
 </body>

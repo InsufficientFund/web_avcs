@@ -2,6 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from .forms import UploadFileForm
 from django.conf import settings
+from test_sleep import run_sleep
+from models import avcs_model
+from django.core import serializers
 
 def index(request):
     form = UploadFileForm()
@@ -29,3 +32,11 @@ def handle_uploaded_file(f):
     with open(settings.MEDIA_ROOT+"upload/"+f.name, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+
+def test_api(request):
+    if request.method == 'GET':
+        run_sleep()
+        all_obj = avcs_model.objects.all()
+        # return_str = [str(obj) for obj in all_obj.values()]
+        return_str = serializers.serialize("json", avcs_model.objects.all())
+        return HttpResponse(return_str)
