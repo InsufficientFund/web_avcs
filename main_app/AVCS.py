@@ -52,8 +52,8 @@ class AVCS:
         if self.video.isOpened():
             self.video.set(cv2.cv.CV_CAP_PROP_POS_MSEC, 0)
             ret, self.sampleFrame = self.video.read()
-        if ret:
-            return self.sampleFrame
+            if ret:
+                return self.sampleFrame
 
     def writeClusters(self, data, members):
         dataF = open('data.csv', 'a')
@@ -161,7 +161,7 @@ class AVCS:
                         equ = cv2.equalizeHist(grayImg)
                         num_car_detect += 1
                         if mode == 'train':
-                            directory = '/home/sayong/Project/web_avcs/static/main_app/media/train_image_1/'
+                            directory = '/home/sayong/Project/web_avcs/static/main_app/media/train_image/'
                             if not os.path.exists(directory):
                                 os.makedirs(directory)
                             #cv2.imwrite(directory+'lane'+str(numLane + 0)+str(totalCars[numLane])+'.png', equ)

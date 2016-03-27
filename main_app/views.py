@@ -15,6 +15,7 @@ import csv
 import os
 import uuid
 
+
 def index(request):
     form = UploadFileForm()
     return render(request, 'main_app/index.html', {'form': form})
@@ -79,7 +80,20 @@ def natural_keys(text):
     return [atoi(c) for c in re.split('(\d+)', text)]
 
 
-def car_detect(request):
+def select_video(request):
+    if request.is_ajax():
+        if request.method == 'GET':
+            filename = request.GET['video_name']
+            counter = AVCS()
+            counter.readVideo('/home/sayong/Project/web_avcs/static/main_app/media/train_video/'+filename)
+            frame = counter.sampleImage()
+            frame_name = filename[:filename.find('.avi')] + '.png'
+            write_path = '/home/sayong/Project/web_avcs/static/main_app/media/train_image/sample/'+frame_name
+            cv2.imwrite(write_path, frame)
+            return HttpResponse('train_image/sample/'+frame_name)
+
+
+def detect(request):
     if request.is_ajax():
         if request.method == 'POST':
             #print 'Raw Data: "%s"' % request.body
@@ -105,10 +119,10 @@ def car_detect(request):
             elapsed_time = time.time() - start_time
             print elapsed_time
 
-            listFile = glob.glob("/home/sayong/Project/web_avcs/static/main_app/media/train_image_1/*.png")
+            listFile = glob.glob("/home/sayong/Project/web_avcs/static/main_app/media/train_image/*.png")
             listFile.sort(key=natural_keys)
             path = '/home/sayong/Project/web_avcs'
-            new_path = '/static/main_app/media/train_image_1/'
+            new_path = '/static/main_app/media/train_image/'
             html = '<form class="form-horizontal" action="/main/train/" method="post" id="select_form">'
             for car_file in listFile:
                 car_image = car_file[car_file.find('/static'):]
@@ -117,7 +131,7 @@ def car_detect(request):
                 current_milli_time = lambda: int(round(time.time() * 1000))
                 html += '<div><input type="text" size="3" name="' + \
                         car_name +'"> <img src="' + \
-                        car_image + '?' + str(current_milli_time()) + '"></div>'
+                        car_image + '?' + str(current_milli_time()) + '"></div><br>'
             html += '</form>'
 
             return HttpResponse(html)
@@ -128,7 +142,7 @@ def improve_data(request):
         if request.method == 'POST':
             selected_data = json.loads(request.body)
             lbp = lbp_feature()
-            path = '/home/sayong/Project/web_avcs/static/main_app/media/train_image_1/'
+            path = '/home/sayong/Project/web_avcs/static/main_app/media/train_image/'
             answer = []
             feature_list = []
             for data in selected_data:
@@ -145,7 +159,7 @@ def improve_data(request):
                 a = csv.writer(fp, delimiter=',')
                 a.writerows(feature_list)
             fp.close()
-            file_list = glob.glob('/home/sayong/Project/web_avcs/static/main_app/media/train_image_1/*.png')
+            file_list = glob.glob('/home/sayong/Project/web_avcs/static/main_app/media/train_image/*.png')
             for f in file_list:
                 os.remove(f)
             return HttpResponse('OK')
@@ -203,16 +217,17 @@ def train(request):
             #         feature_list.append(feature)
             neural_network = neural_net(75, 3)
             neural_network.create_struct(150)
-            file_train = '/home/sayong/Project/AVCS/Car-counter-using-python-opencv/list_data_raw.csv'
-            file_test = '/home/sayong/Project/AVCS/Car-counter-using-python-opencv/list_test_raw.csv'
+            # file_train = '/home/sayong/Project/AVCS/Car-counter-using-python-opencv/list_data_raw.csv'
+            # file_test = '/home/sayong/Project/AVCS/Car-counter-using-python-opencv/list_test_raw.csv'
+            file_train = '/home/sayong/Project/web_avcs/static/main_app/media/train_data.csv'
             #neural_network.data_input(feature_list, answer, "train")
             neural_network.file_input(file_train)
-            neural_network.file_input(file_test, type_set='test')
-            test_data, test_answer = neural_network.get_test_data()
-            #neural_network.training(5000)
-            neural_network.load_model()
-            print neural_network.predict(test_data[0])
-            print test_answer[0]
+            #neural_network.file_input(file_test, type_set='test')
+            #test_data, test_answer = neural_network.get_test_data()
+            neural_network.training(5000)
+            neural_network.save_model()
+            #print neural_network.predict(test_data[0])
+            #print test_answer[0]
             return HttpResponse('OK')
 
 
