@@ -4,7 +4,6 @@ function point_it(event){
 	document.getElementById("cross").style.left = (pos_x-1) ;
 	document.getElementById("cross").style.top = (pos_y-15) ;
 	document.getElementById("cross").style.visibility = "visible" ;
-	console.log($("#pos_select").html() );
 	if ($("#pos_select").html() == '0'){
 	    document.pointform.up_left_x.value = pos_x;
 	    document.pointform.up_left_y.value = pos_y;
@@ -91,3 +90,20 @@ function add_lane(event){
 function remove_lane(event){
     sessionStorage.removeItem('lane');
 }
+
+$('#lane_button').click(function() {
+    var lane = JSON.parse(sessionStorage.getItem("lane"));
+    var html = '';
+    for (x in lane){
+        html += '<div class="row"><div class="col-md-3"> up left: '+lane[x]['up_left'][0]+', '+lane[x]['up_left'][1]+'</div>'
+        html += '<div class="col-md-3"> up right: '+lane[x]['up_right'][0]+', '+lane[x]['up_right'][1]+'</div>'
+        html += '<div class="col-md-3"> up right: '+lane[x]['up_right'][0]+', '+lane[x]['up_right'][1]+'</div>'
+        html += '<div class="col-md-3"> up right: '+lane[x]['up_right'][0]+', '+lane[x]['up_right'][1]+'</div></div>'
+    }
+    var num_lane = 0;
+    if (lane){
+        num_lane = lane.length
+    }
+    $('#num_lane').html('Total lanes :' + num_lane);
+    $('#lane').html(html);
+});
