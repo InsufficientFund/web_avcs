@@ -5,6 +5,7 @@ import math
 import os
 from lbp_feature import lbp_feature
 from neural_net import neural_net
+from save_type import save_type
 
 class AVCS:
     """docstring for ClassName"""
@@ -21,12 +22,14 @@ class AVCS:
         self.lanePoints = []
         self.typeCar = {"small": 0, "medium": 0, "large": 0}
         self.totalLane = 0
+        self.video_name = ''
 
     def __del__(self):
         pass
 
-    def readVideo(self, inputName):
-        self.video = cv2.VideoCapture(inputName)
+    def readVideo(self, path_name, file_name):
+        self.video = cv2.VideoCapture(path_name)
+        self.video_name = file_name
 
     def addLane(self, upLeft, upRight, lowLeft, lowRight):
         self.lanes.append({"upLeft": upLeft, "upRight": upRight,
@@ -152,26 +155,20 @@ class AVCS:
                         originX = i["origin"][0]
                         originY = i["origin"][1]
                         crop_img = frameOrigin[originY:originY + i["height"], originX:originX+i["width"]]
-                        #crop_img2 = bgFrame[originY:originY + i["height"], originX:originX+i["width"]]
-                        #bgrm_img = cv2.absdiff(crop_img2, crop_img)
-                        normalImage = cv2.resize(crop_img, (64, 64))
-                        grayImg = cv2.cvtColor(normalImage, cv2.COLOR_BGR2GRAY)
-                        # grayImg = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
-                        # normalImage = cv2.resize(grayImg, (64, 64))
-                        equ = cv2.equalizeHist(grayImg)
+                        normal_image = cv2.resize(crop_img, (64, 64))
                         num_car_detect += 1
                         if mode == 'train':
                             directory = '/home/sayong/Project/web_avcs/static/main_app/media/train_image/'
                             if not os.path.exists(directory):
                                 os.makedirs(directory)
-                            #cv2.imwrite(directory+'lane'+str(numLane + 0)+str(totalCars[numLane])+'.png', equ)
                             cv2.imwrite(directory + 'car'+str(num_car_detect)+'.png', crop_img)
                         if mode == 'predict':
                             height, width, channels = crop_img.shape
                             size_data = [height/100.0, width/100.0, height * width/10000.0]
-                            lbp.read_image(normalImage)
+                            lbp.read_image(normal_image)
                             feature = lbp.extract_feature(size_data[0], size_data[1], size_data[2])
                             answer = neural_network.predict(feature)
+                            save_type(self.video_name, answer)
                             print answer
 
                         lanes[numLane].remove(foundedObj)
@@ -182,7 +179,6 @@ class AVCS:
                     diffRange = 50
                     foundedObj = None
                     for j in lanes[numLane]:
-                        #import ipdb;ipdb.set_trace()
                         diff = math.fabs(j["point"][0][0] - i["centroid"][0]) + math.fabs(j["point"][0][1] - i["centroid"][1])
 
                         if diff < diffRange:

@@ -6,7 +6,6 @@ urlpatterns = [
     url(r'^predict_page/', views.predict_page, name='predict_page'),
     url(r'^get_sample_frame/', views.get_sample_frame, name='get_sample_frame'),
     url(r'^select_video/', views.select_video, name='select_video'),
-    url(r'^getimg/', views.get_image, name='get_image'),
     url(r'^train/', views.train, name='train'),
     url(r'^detect/', views.detect, name='detect'),
     url(r'^imp_data/', views.improve_data, name='improve_data'),
