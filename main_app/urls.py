@@ -3,6 +3,7 @@ from django.conf.urls import url
 urlpatterns = [
     url(r'^upload/', views.upload, name='upload'),
     url(r'^train_page/', views.train_page, name='train_page'),
+    url(r'^predict_page/get_graph_data/', views.get_graph_data, name='get_graph_data'),
     url(r'^predict_page/', views.predict_page, name='predict_page'),
     url(r'^get_sample_frame/', views.get_sample_frame, name='get_sample_frame'),
     url(r'^select_video/', views.select_video, name='select_video'),

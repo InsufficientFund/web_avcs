@@ -2,6 +2,7 @@ function send_predict(event){
     var json_data = {}
     json_data["data"] = sessionStorage.getItem('lane');
     json_data["video_name"] = $("#video_name").html();
+    json_data["email"] = $("#email").val();
     $.ajax({
         url: "/main/predict/",
         type: "POST",

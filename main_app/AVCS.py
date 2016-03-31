@@ -6,11 +6,11 @@ import os
 from lbp_feature import lbp_feature
 from neural_net import neural_net
 from save_type import save_type
+from django.conf import settings
 
 class AVCS:
     """docstring for ClassName"""
     def __init__(self):
-        self.count = [0] * 2
         self.video = None
         self.fgMask = None
         self.sampleFrame = None
@@ -74,7 +74,7 @@ class AVCS:
         lbp = lbp_feature()
         neural_network = neural_net(75, 3)
         neural_network.create_struct(150)
-        neural_network.load_model()
+        neural_network.load_model(settings.STATICFILES_DIRS[0])
         self.video.set(cv2.cv.CV_CAP_PROP_POS_MSEC, 0)
         kernel = np.ones((10, 10), np.uint8)
         lanes = [[] for x in range(self.totalLane)]
@@ -158,7 +158,7 @@ class AVCS:
                         normal_image = cv2.resize(crop_img, (64, 64))
                         num_car_detect += 1
                         if mode == 'train':
-                            directory = '/home/sayong/Project/web_avcs/static/main_app/media/train_image/'
+                            directory = settings.STATICFILES_DIRS[0]+'main_app/media/train_image/'
                             if not os.path.exists(directory):
                                 os.makedirs(directory)
                             cv2.imwrite(directory + 'car'+str(num_car_detect)+'.png', crop_img)
@@ -220,7 +220,7 @@ class AVCS:
                         break
                     else:
                         cv2.rectangle(res, (pX, pY), (pX+w, pY+h), (255, 255, 0), 2)
-            for i in range(0, 2):
+            for i in range(0, self.totalLane):
                 if isIn[i]:
                     if showVid:
                         pass

@@ -97,8 +97,8 @@ $('#lane_button').click(function() {
     for (x in lane){
         html += '<div class="row"><div class="col-md-3"> up left: '+lane[x]['up_left'][0]+', '+lane[x]['up_left'][1]+'</div>'
         html += '<div class="col-md-3"> up right: '+lane[x]['up_right'][0]+', '+lane[x]['up_right'][1]+'</div>'
-        html += '<div class="col-md-3"> up right: '+lane[x]['up_right'][0]+', '+lane[x]['up_right'][1]+'</div>'
-        html += '<div class="col-md-3"> up right: '+lane[x]['up_right'][0]+', '+lane[x]['up_right'][1]+'</div></div>'
+        html += '<div class="col-md-3"> low left: '+lane[x]['low_left'][0]+', '+lane[x]['low_left'][1]+'</div>'
+        html += '<div class="col-md-3"> low right: '+lane[x]['low_right'][0]+', '+lane[x]['low_right'][1]+'</div></div>'
     }
     var num_lane = 0;
     if (lane){

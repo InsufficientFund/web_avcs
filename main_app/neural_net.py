@@ -114,13 +114,13 @@ class neural_net:
     def get_test_data(self):
         return self.testing_data, self.testing_answer
 
-    def save_model(self):
+    def save_model(self, path):
         saver = tf.train.Saver()
-        saver.save(self.sess, '/home/sayong/Project/web_avcs/static/main_app/media/model.ckpt')
+        saver.save(self.sess, path+'main_app/media/model.ckpt')
 
-    def load_model(self):
+    def load_model(self, path):
         saver = tf.train.Saver()
-        saver.restore(self.sess, '/home/sayong/Project/web_avcs/static/main_app/media/model.ckpt')
+        saver.restore(self.sess, path+'main_app/media/model.ckpt')
 
 # def init_weights(shape):
 #     return tf.Variable(tf.random_normal(shape, stddev=0.01))
