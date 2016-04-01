@@ -11,6 +11,7 @@ from AVCS import AVCS
 from lbp_feature import lbp_feature
 from neural_net import neural_net
 from models import CarsModel
+from models import ProgressModel
 import glob
 import re
 import csv
@@ -18,6 +19,8 @@ import os
 import uuid
 import requests
 from multiprocessing import Pool
+
+
 
 def index(request):
     form = UploadFileForm()
@@ -256,6 +259,28 @@ def get_graph_data(request):
             'l': large_type_count,
         }
 
+        return HttpResponse(json.dumps(return_obj))
+        # return HttpResponse(return_str)
+
+def get_progress_data(request):
+    if request.method == 'GET':
+        # all_obj = CarsModel.objects.all()
+        file_name = request.GET.get('video_name')
+        # import ipdb; ipdb.set_trace()
+        # return_str = [str(obj) for obj in all_obj.values()]
+        # small_type_count = CarsModel.objects.filter(car_type='2',file_name=file_name).count()
+        # medium_type_count = CarsModel.objects.filter(car_type='1',file_name=file_name).count()
+        # large_type_count = CarsModel.objects.filter(car_type='0',file_name=file_name).count()
+        progress  = ProgressModel.objects.filter(file_name=file_name)
+        # return_str = serializers.serialize("json", all_obj)
+        # return_obj = {
+        #     's': small_type_count,
+        #     'm': medium_type_count,
+        #     'l': large_type_count,
+        # }
+        return_obj = {
+            'progress': progress,
+        }
         return HttpResponse(json.dumps(return_obj))
         # return HttpResponse(return_str)
 

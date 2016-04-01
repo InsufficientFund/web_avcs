@@ -1,4 +1,12 @@
 function send_predict(event){
+    var app = angular.module('progressApp', ['ngProgress']);
+    var MainCtrl = function($scope, ngProgressFactory) {
+        $scope.progressbar = ngProgressFactory.createInstance();
+        $scope.progressbar.start();
+        ngProgress.set(100);
+
+    }
+    app.controller('progressctrl', MainCtrl);
     var json_data = {}
     json_data["data"] = sessionStorage.getItem('lane');
     json_data["video_name"] = $("#video_name").html();
@@ -12,6 +20,8 @@ function send_predict(event){
             alert(data);
         },
     });
+
+
 }
 
 function select_video(){

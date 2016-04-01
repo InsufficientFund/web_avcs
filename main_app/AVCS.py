@@ -5,8 +5,9 @@ import math
 import os
 from lbp_feature import lbp_feature
 from neural_net import neural_net
-from save_type import save_type
+from save_type import save_type, update_progress
 from django.conf import settings
+import threading
 
 class AVCS:
     """docstring for ClassName"""
@@ -23,6 +24,8 @@ class AVCS:
         self.typeCar = {"small": 0, "medium": 0, "large": 0}
         self.totalLane = 0
         self.video_name = ''
+        self.num_frame = 0
+        self.timer = None
 
     def __del__(self):
         pass
@@ -70,6 +73,15 @@ class AVCS:
         res = cv2.convertScaleAbs(avg)
         return res
 
+    def get_num_frame(self):
+        return int(self.video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
+
+    def progress(self):
+        self.timer = threading.Timer(5.0, self.progress)
+        self.timer.start()
+        #print 'frame' + str(self.num_frame)
+        update_progress(self.video_name, self.num_frame)
+
     def run(self, mode,  cntStatus = True, saveVid = False, showVid = True ):
         lbp = lbp_feature()
         neural_network = neural_net(75, 3)
@@ -81,13 +93,15 @@ class AVCS:
         totalCars = [0] * self.totalLane
         dataPlot = []
         num_car_detect = 0
+        self.timer = threading.Timer(5.0, self.progress)
+        self.timer.start()
         while self.video.isOpened():
             ret, frame = self.video.read()
             if not ret:
                 break
             frameOrigin = deepcopy(frame)
             res = frame
-
+            self.num_frame +=1
             for point in self.lanePoints:
                 cv2.polylines(frame, [point], True, (0, 255, 0), 3)
 
@@ -241,7 +255,8 @@ class AVCS:
                     cv2.imwrite('tesf.png', frameOrigin)
                     cv2.imwrite('tesM.png', self.fgMask)
                     break
-
+        self.timer.cancel()
+        update_progress(self.video_name, self.num_frame)
         print totalCars
         self.video.release()
         cv2.destroyAllWindows()
