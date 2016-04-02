@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from django.db import models
+from datetime import datetime
 
 
 class CarsModel(models.Model):
@@ -18,7 +19,7 @@ class ProgressModel(models.Model):
 
 class ResultModel(models.Model):
     """docstring for ProgressModel"""
+    unique_name = models.CharField(max_length=60, primary_key=True)
     file_name = models.CharField(max_length=60)
-    unique_name = models.CharField(max_length=60)
     email = models.CharField(max_length=60)
-    time = models.DateTimeField
+    time = models.DateTimeField(default=datetime.now, blank=True)
