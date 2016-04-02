@@ -6,6 +6,7 @@ class CarsModel(models.Model):
     """docstring for CarsModel"""
     file_name = models.CharField(max_length=60)
     car_type = models.CharField(max_length=10)
+    frame = models.IntegerField()
 
 
 class ProgressModel(models.Model):

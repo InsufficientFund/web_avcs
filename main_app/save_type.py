@@ -1,8 +1,9 @@
 from main_app.models import CarsModel
 from main_app.models import ProgressModel
 
-def save_type(file_name, car_type):
-    db = CarsModel(car_type=car_type, file_name=file_name)
+
+def save_type(file_name, car_type,frame):
+    db = CarsModel(car_type=car_type, file_name=file_name, frame=frame)
     db.save()
 
 

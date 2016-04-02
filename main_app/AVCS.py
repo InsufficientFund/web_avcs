@@ -184,7 +184,7 @@ class AVCS:
                             lbp.read_image(normal_image)
                             feature = lbp.extract_feature(size_data[0], size_data[1], size_data[2])
                             answer = neural_network.predict(feature)
-                            save_type(self.video_name, answer)
+                            save_type(self.video_name, answer, self.num_frame)
                             print answer
 
                         lanes[numLane].remove(foundedObj)

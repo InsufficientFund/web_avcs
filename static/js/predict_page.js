@@ -113,7 +113,7 @@ app.controller('MainController', ['$scope', '$http', '$interval', 'ngProgressFac
                 max_frame = response['data']['max_frame'];
                 progress = (current_frame * 100)/max_frame;
                 if (max_frame != 0){
-                    if (current_frame+1 == max_frame){
+                    if (current_frame == max_frame){
                         $interval.cancel(stop);
                     }
                     else{
