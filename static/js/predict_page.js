@@ -6,7 +6,6 @@ function select_video(){
         contentType: "application/json",
     }).done(function(data) {
         $('#pointer_div').attr('style', 'background-image:url("/static/main_app/media/' +data+'");border:1px solid black');
-        alert('ok');
     });
 }
 
@@ -24,7 +23,6 @@ function upload(event) {
         success: function(data) {
             $("#video_name").html(data);
             select_video();
-            alert('success');
         }
     });
     return false;
@@ -67,7 +65,6 @@ app.controller('MainController', ['$scope', '$http', '$interval', 'ngProgressFac
             data: JSON.stringify(json_data),
             contentType: "application/json",
             success:function(data) {
-                alert(data);
             },
         });
         stop = $interval(function() {

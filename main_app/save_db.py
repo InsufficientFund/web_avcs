@@ -11,3 +11,4 @@ def update_progress(file_name, progress, max_frame):
     db = ProgressModel(file_name=file_name, progress=progress, max_frame=max_frame)
     db.save()
 
+

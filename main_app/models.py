@@ -15,3 +15,10 @@ class ProgressModel(models.Model):
     progress = models.IntegerField()
     max_frame = models.IntegerField()
 
+
+class ResultModel(models.Model):
+    """docstring for ProgressModel"""
+    file_name = models.CharField(max_length=60)
+    unique_name = models.CharField(max_length=60)
+    email = models.CharField(max_length=60)
+    time = models.DateTimeField

@@ -5,7 +5,7 @@ import math
 import os
 from lbp_feature import lbp_feature
 from neural_net import neural_net
-from save_type import save_type, update_progress
+from save_db import save_type, update_progress
 from django.conf import settings
 import threading
 
@@ -93,7 +93,6 @@ class AVCS:
         kernel = np.ones((10, 10), np.uint8)
         lanes = [[] for x in range(self.totalLane)]
         totalCars = [0] * self.totalLane
-        dataPlot = []
         num_car_detect = 0
         self.timer = threading.Timer(5.0, self.progress)
         self.timer.start()
@@ -137,8 +136,8 @@ class AVCS:
                 isNotLane = True
                 for numLane in range(len(self.laneContours)):
                     if cv2.pointPolygonTest(self.laneContours[numLane][0], (cx, cy), False) == 1:
-                        carObj = {"centroid": (cx, cy+h/2), "origin": (pX, pY), "height": h, "width": w}
-                        laneObj[numLane].append(carObj)
+                        car_object = {"centroid": (cx, cy+h/2), "origin": (pX, pY), "height": h, "width": w}
+                        laneObj[numLane].append(car_object)
                         isNotLane = False
                         break
                 if isNotLane:
@@ -147,8 +146,8 @@ class AVCS:
 
                         if cx >= lanePoint[3][0][0] and cx <= lanePoint[2][0][0]\
                                 and cy >= lanePoint[3][0][1]  and cy <= lanePoint[3][0][1]+50:
-                            carObj = {"centroid": (cx, cy+h/2), "origin": (pX, pY), "height": h, "width": w}
-                            outLane[numLane].append(carObj)
+                            car_object = {"centroid": (cx, cy+h/2), "origin": (pX, pY), "height": h, "width": w}
+                            outLane[numLane].append(car_object)
 
             for numLane in range(len(self.laneContours)):
                 for i in outLane[numLane]:
@@ -159,15 +158,8 @@ class AVCS:
                         if diff < diffRange:
                             diffRange = diff
                             foundedObj = j
-                    if foundedObj != None:
+                    if foundedObj is not None:
                         totalCars[numLane] += 1
-                        dataPlot.append(i["height"] * i["width"])
-                        if i["height"] * i["width"] < 2500:
-                            self.typeCar["small"] += 1
-                        elif i["height"] * i["width"] < 25000:
-                            self.typeCar["medium"] += 1
-                        else:
-                            self.typeCar["large"] += 1
                         originX = i["origin"][0]
                         originY = i["origin"][1]
                         crop_img = frameOrigin[originY:originY + i["height"], originX:originX+i["width"]]
@@ -185,6 +177,12 @@ class AVCS:
                             feature = lbp.extract_feature(size_data[0], size_data[1], size_data[2])
                             answer = neural_network.predict(feature)
                             save_type(self.video_name, answer, self.num_frame)
+                            if answer == 2:
+                                self.typeCar["small"] += 1
+                            elif answer == 1:
+                                self.typeCar["medium"] += 1
+                            else:
+                                self.typeCar["large"] += 1
                             print answer
 
                         lanes[numLane].remove(foundedObj)
@@ -200,12 +198,12 @@ class AVCS:
                         if diff < diffRange:
                             diffRange = diff
                             foundedObj = j
-                    if foundedObj != None:
+                    if foundedObj is not None:
                         foundedObj["point"].insert(0, i["centroid"])
                         foundedObj["stat"] = True
                     else:
                         lanes[numLane].append({ "point": [i["centroid"]], "stat": True })
-                tempLane =[]
+                tempLane = []
                 for i in lanes[numLane]:
                     if i["stat"]:
                         tempLane.append(i)
