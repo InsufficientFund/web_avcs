@@ -12,4 +12,5 @@ class ProgressModel(models.Model):
     """docstring for ProgressModel"""
     file_name = models.CharField(max_length=60, primary_key=True)
     progress = models.IntegerField()
+    max_frame = models.IntegerField()
 

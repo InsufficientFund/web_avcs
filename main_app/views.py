@@ -235,13 +235,13 @@ def asnyc_count(dest, file_name, lane_data):
     send_mail(dest, file_name)
 
 
-
 def get_detect_status(request):
     if request.method == 'GET':
         all_obj = CarsModel.objects.all()
         # return_str = [str(obj) for obj in all_obj.values()]
         return_str = serializers.serialize("json", CarsModel.objects.all())
         return HttpResponse(return_str)
+
 
 def get_graph_data(request):
     if request.method == 'GET':
@@ -271,16 +271,24 @@ def get_progress_data(request):
         # small_type_count = CarsModel.objects.filter(car_type='2',file_name=file_name).count()
         # medium_type_count = CarsModel.objects.filter(car_type='1',file_name=file_name).count()
         # large_type_count = CarsModel.objects.filter(car_type='0',file_name=file_name).count()
-        progress  = ProgressModel.objects.filter(file_name=file_name)
+        try:
+            progress_object = ProgressModel.objects.get(pk=file_name)
+            return_obj = {
+                'progress': progress_object.progress,
+                'max_frame': progress_object.max_frame,
+            }
+        except ProgressModel.DoesNotExist:
+            return_obj = {
+                'progress': 0,
+                'max_frame': 0,
+            }
         # return_str = serializers.serialize("json", all_obj)
         # return_obj = {
         #     's': small_type_count,
         #     'm': medium_type_count,
         #     'l': large_type_count,
         # }
-        return_obj = {
-            'progress': progress,
-        }
+
         return HttpResponse(json.dumps(return_obj))
         # return HttpResponse(return_str)
 

@@ -6,7 +6,7 @@ def save_type(file_name, car_type):
     db.save()
 
 
-def update_progress(file_name, progress):
-    db = ProgressModel(file_name=file_name, progress=progress)
+def update_progress(file_name, progress, max_frame):
+    db = ProgressModel(file_name=file_name, progress=progress, max_frame=max_frame)
     db.save()
 

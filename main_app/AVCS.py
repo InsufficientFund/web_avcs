@@ -26,6 +26,7 @@ class AVCS:
         self.video_name = ''
         self.num_frame = 0
         self.timer = None
+        self.total_frame = 0
 
     def __del__(self):
         pass
@@ -33,6 +34,7 @@ class AVCS:
     def readVideo(self, path_name, file_name):
         self.video = cv2.VideoCapture(path_name)
         self.video_name = file_name
+        self.total_frame = int(self.video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
 
     def addLane(self, upLeft, upRight, lowLeft, lowRight):
         self.lanes.append({"upLeft": upLeft, "upRight": upRight,
@@ -74,13 +76,13 @@ class AVCS:
         return res
 
     def get_num_frame(self):
-        return int(self.video.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
+        return self.total_frame
 
     def progress(self):
         self.timer = threading.Timer(5.0, self.progress)
         self.timer.start()
         #print 'frame' + str(self.num_frame)
-        update_progress(self.video_name, self.num_frame)
+        update_progress(self.video_name, self.num_frame, self.total_frame)
 
     def run(self, mode,  cntStatus = True, saveVid = False, showVid = True ):
         lbp = lbp_feature()
@@ -256,7 +258,7 @@ class AVCS:
                     cv2.imwrite('tesM.png', self.fgMask)
                     break
         self.timer.cancel()
-        update_progress(self.video_name, self.num_frame)
+        update_progress(self.video_name, self.num_frame, self.total_frame)
         print totalCars
         self.video.release()
         cv2.destroyAllWindows()

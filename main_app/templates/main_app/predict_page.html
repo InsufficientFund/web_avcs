@@ -23,69 +23,6 @@
         <script src="{%static 'angular_module/bower_components/d3/d3.min.js'%}"></script>
         <script src="{%static 'angular_module/bower_components/ngprogress/build/ngprogress.min.js'%}"></script>
         <link rel="stylesheet" href="{%static 'angular_module/bower_components/ngprogress/ngProgress.css'%}">
-        <script>
-          var app = angular.module("MainApp", ['n3-pie-chart']);
-          app.config(function($interpolateProvider){
-          $interpolateProvider.startSymbol('{-').endSymbol('-}');
-          });
-          app.controller('MainController', ['$scope', '$http', '$interval', function($scope,$http,$interval) {
-              $scope.title = 'Top Sellers in Books';
-              $scope.test_api_call = function(){
-                  $http({method:'GET', url:'test_api/'})
-                  .then(function(response){
-                      debugger;
-                  });
-                  debugger;
-              };
-              // $http({method:'GET', url:'get_graph_data/'})
-              // .then(function(response){
-              //     angular.forEach(response['data'],function(type_data){
-              //       var a = [];
-              //       a.push({type_data})
-              //     })
-              // });
-              $scope.data = [
-                {label: "Bikes", value: 0, color: "red"},
-                {label: "Passenger cars", value: 0, color: "#00ff00"},
-                {label: "Truck", value: 0, color: "rgb(0, 0, 255)"}
-              ];
-              $scope.options = {thickness: 10};
-              stop = $interval(function() {
-                    // $http({method:'GET', url:'test_api/'})
-                    // .then(function(response){
-                    //   $scope.data = [
-                    //     {label: "one", value: 12.2, color: "red"},
-                    //     {label: "two", value: 45, color: "#00ff00"},
-                    //     {label: "three", value: 10, color: "rgb(0, 0, 255)"}
-                    //   ];
-                    // });
-                    $scope.vid_name = $('#video_name').html()
-                    if($scope.vid_name != "" ){
-                      $http({method:'GET', url:'get_graph_data/',params:{'video_name':$scope.vid_name}})
-                      .then(function(response){
-                        $scope.data = [
-                          {label: "Bikes", value: response['data']['s'], color: "red"},
-                          {label: "Passenger cars", value: response['data']['m'], color: "#00ff00"},
-                          {label: "Trucks", value: response['data']['l'], color: "rgb(0, 0, 255)"}
-                        ];
-                        if(($scope.data[0]['value']+$scope.data[1]['value']+$scope.data[2]['value']) > 0){
-                          $scope.has_graph_data = true;
-                        }
-                        else {
-                          $scope.has_graph_data = false;
-                        }
-                      });
-                    }
-              }, 5000);
-              // $scope.has_graph_data = $scope.data[0]['value']+$scope.data[1]['value']+$scope.data[2]['value']
-              // if(($scope.data[0]['value']+$scope.data[1]['value']+$scope.data[2]['value']) > 0){
-              //   $scope.has_graph_data = true;
-              // }
-              // else {
-              //   $scope.has_graph_data = false;
-              // }
-          }]);
-       </script>
     </head>
     <body ng-app="MainApp">
         {% csrf_token %}
