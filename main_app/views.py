@@ -217,7 +217,8 @@ def predict(request):
             #print elapsed_time
             pool = Pool(processes=1)
             result = pool.apply_async(asnyc_count, [json_data['email'], json_data['video_name'], lane_data])
-
+            pool.close()
+            pool.join()
             return HttpResponse('OK_OK')
 
 
@@ -233,6 +234,7 @@ def asnyc_count(dest, file_name, lane_data):
         counter.addLane(up_left, up_right, low_left, low_right)
     counter.run(mode='predict', cntStatus=False, showVid=False)
     send_mail(dest, file_name)
+    return 0
 
 
 def get_detect_status(request):

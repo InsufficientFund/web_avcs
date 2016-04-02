@@ -1,22 +1,3 @@
-function send_predict(event){
-
-    var json_data = {}
-    json_data["data"] = sessionStorage.getItem('lane');
-    json_data["video_name"] = $("#video_name").html();
-    json_data["email"] = $("#email").val();
-    $.ajax({
-        url: "/main/predict/",
-        type: "POST",
-        data: JSON.stringify(json_data),
-        contentType: "application/json",
-        success:function(data) {
-            alert(data);
-        },
-    });
-
-
-}
-
 function select_video(){
     console.log('video');
     $.ajax({
@@ -68,67 +49,61 @@ app.controller('MainController', ['$scope', '$http', '$interval', 'ngProgressFac
         };
     $scope.progressbar = ngProgressFactory.createInstance();
     $scope.progressbar.setHeight('10px');
-    //ngProgress.set(100);
-    // $http({method:'GET', url:'get_graph_data/'})
-    // .then(function(response){
-    //     angular.forEach(response['data'],function(type_data){
-    //       var a = [];
-    //       a.push({type_data})
-    //     })
-    // });
     $scope.data = [
         {label: "Bikes", value: 0, color: "red"},
         {label: "Passenger cars", value: 0, color: "#00ff00"},
         {label: "Truck", value: 0, color: "rgb(0, 0, 255)"}
     ];
     $scope.options = {thickness: 10};
-    stop = $interval(function() {
-        // $http({method:'GET', url:'test_api/'})
-        // .then(function(response){
-        //   $scope.data = [
-        //     {label: "one", value: 12.2, color: "red"},
-        //     {label: "two", value: 45, color: "#00ff00"},
-        //     {label: "three", value: 10, color: "rgb(0, 0, 255)"}
-        //   ];
-        // });
-        $scope.vid_name = $('#video_name').html()
-        if($scope.vid_name != "" ){
-            $http({method:'GET', url:'get_graph_data/', params:{'video_name':$scope.vid_name}})
-            .then(function(response){
-                $scope.data = [
-                    {label: "Bikes", value: response['data']['s'], color: "red"},
-                    {label: "Passenger cars", value: response['data']['m'], color: "#00ff00"},
-                    {label: "Trucks", value: response['data']['l'], color: "rgb(0, 0, 255)"}
-                ];
-                if(($scope.data[0]['value']+$scope.data[1]['value']+$scope.data[2]['value']) > 0){
-                    $scope.has_graph_data = true;
-                }
-                else {
-                    $scope.has_graph_data = false;
-                }
-            });
-            $http({method:'GET', url:'get_progress_data/', params:{'video_name':$scope.vid_name}})
-            .then(function(response){
-                current_frame = response['data']['progress'];
-                max_frame = response['data']['max_frame'];
-                progress = (current_frame * 100)/max_frame;
-                if (max_frame != 0){
-                    if (current_frame == max_frame){
-                        $interval.cancel(stop);
+    $scope.send_predict = function($event){
+        $scope.progressbar.set(0);
+        var json_data = {}
+        json_data["data"] = sessionStorage.getItem('lane');
+        json_data["video_name"] = $("#video_name").html();
+        json_data["email"] = $("#email").val();
+        $.ajax({
+            url: "/main/predict/",
+            type: "POST",
+            data: JSON.stringify(json_data),
+            contentType: "application/json",
+            success:function(data) {
+                alert(data);
+            },
+        });
+        stop = $interval(function() {
+            $scope.vid_name = $('#video_name').html()
+            if($scope.vid_name != "" ){
+                $http({method:'GET', url:'get_graph_data/', params:{'video_name':$scope.vid_name}})
+                .then(function(response){
+                    $scope.data = [
+                        {label: "Bikes", value: response['data']['s'], color: "red"},
+                        {label: "Passenger cars", value: response['data']['m'], color: "#00ff00"},
+                        {label: "Trucks", value: response['data']['l'], color: "rgb(0, 0, 255)"}
+                    ];
+                    if(($scope.data[0]['value']+$scope.data[1]['value']+$scope.data[2]['value']) > 0){
+                        $scope.has_graph_data = true;
                     }
-                    else{
-                        $scope.progressbar.set(progress);
+                    else {
+                        $scope.has_graph_data = false;
                     }
-                }
+                });
+                $http({method:'GET', url:'get_progress_data/', params:{'video_name':$scope.vid_name}})
+                .then(function(response){
+                    current_frame = response['data']['progress'];
+                    max_frame = response['data']['max_frame'];
+                    progress = (current_frame * 100)/max_frame;
+                    if (max_frame != 0){
+                        if (current_frame == max_frame){
+                            $scope.progressbar.set(100);
+                            $interval.cancel(stop);
+                        }
+                        else{
+                            $scope.progressbar.set(progress);
+                        }
+                    }
 
-            });
-        }
-    }, 5000);
-    // $scope.has_graph_data = $scope.data[0]['value']+$scope.data[1]['value']+$scope.data[2]['value']
-    // if(($scope.data[0]['value']+$scope.data[1]['value']+$scope.data[2]['value']) > 0){
-    //   $scope.has_graph_data = true;
-    // }
-    // else {
-    //   $scope.has_graph_data = false;
-    // }
+                });
+            }
+        }, 5000);
+    }
 }]);
