@@ -1,0 +1,44 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resend data</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="col-md-6 ">
+            <h3>Search result</h3>
+            <hr>
+            Email: <input type="text" id="email"><br><br>
+            File:&nbsp;&nbsp;&nbsp; <input type="text" id="file_name">
+            <br><br>
+            <button type="button" class="btn btn-info" onclick="search(event)">search</button>
+        </div>
+        <div class="col-md-6">
+            <h3>Result</h3>
+            <hr>
+            <div id="video"></div>
+        </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script>
+        function search(event){
+            console.log('search');
+            $.ajax({
+                url: '/main/search_res/',
+                data: {email:$("#email").val(),
+                        file:$("#file_name").val()},
+                contentType: "application/json",
+            }).done(function(data) {
+                $('#video').html(data)
+            });
+        }
+
+
+    </script>
+</body>
+</html>

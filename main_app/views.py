@@ -20,7 +20,7 @@ import os
 import uuid
 import requests
 from multiprocessing import Pool
-
+from datetime import timedelta
 
 def index(request):
     form = UploadFileForm()
@@ -312,9 +312,9 @@ def send_mail(dest, file_name):
     sandbox = 'sandbox3e44ff53154a450faa54ffdf485d7bc4.mailgun.org'
     recipient = dest
 
-    small_count = CarsModel.objects.filter(car_type='2',file_name=file_name).count()
-    medium_count = CarsModel.objects.filter(car_type='1',file_name=file_name).count()
-    large_count = CarsModel.objects.filter(car_type='0',file_name=file_name).count()
+    small_count = CarsModel.objects.filter(car_type='2', file_name=file_name).count()
+    medium_count = CarsModel.objects.filter(car_type='1', file_name=file_name).count()
+    large_count = CarsModel.objects.filter(car_type='0', file_name=file_name).count()
 
     send_text = 'Total cars: ' + str(small_count+medium_count+large_count)+ '\nTotal'\
                 ' Trucks: ' + str(large_count)+ '\nTotal '\
@@ -332,3 +332,31 @@ def send_mail(dest, file_name):
 
     print 'Status: {0}'.format(request.status_code)
     print 'Body:   {0}'.format(request.text)
+
+
+def resend_data(request):
+    if request.method == 'GET':
+        return render(request, 'main_app/resend.html')
+
+
+def search_res(request):
+    if request.method == 'GET':
+        email = request.GET.get('email')
+        file_name = request.GET.get('file')
+        result_list = ResultModel.objects.filter(file_name=file_name, email=email)
+        html = ''
+        for result_object in result_list:
+            html += '<a href="/main/send_result?res='+result_object.unique_name+'&email='+result_object.email+'">'
+            html += result_object.file_name+'</a> '+format(result_object.time + timedelta(hours=7), '%d/%m/%Y-%H:%M:%S')+'<br>'
+
+        return HttpResponse(html)
+
+
+def send_result(request):
+    if request.method == 'GET':
+        unique_name = request.GET.get('res')
+        email = request.GET.get('email')
+        file_name = unique_name[:unique_name.find('.csv')] + '.avi'
+        send_mail(email, file_name)
+        return HttpResponse('success')
+
