@@ -16,6 +16,10 @@ urlpatterns = [
     url(r'^resend/', views.resend_data, name='resend_data'),
     url(r'^search_res/', views.search_res, name='search_res'),
     url(r'^send_result/', views.send_result, name='send_result'),
+    url(r'^login/', views.login_view, name='login_view'),
+    url(r'^logout/', views.logout_session, name='logout_session'),
+    url(r'^auth/', views.auth_and_login, name='auth_and_login'),
+    url(r'^result_image/', views.result_image, name='result_image'),
     url(r'^$', views.index, name='index'),
 
 ]

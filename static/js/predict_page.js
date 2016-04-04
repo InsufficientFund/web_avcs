@@ -158,7 +158,14 @@ app.controller('MainController', ['$scope', '$http', '$interval', 'ngProgressFac
                     console.log($scope.data_line)
                 });
               }
-          }
+                $.ajax({
+                    url: '/main/result_image/',
+                    data: {video_name:$("#video_name").html()},
+                    contentType: "application/json",
+                }).done(function(data) {
+                    $('#result').html(data);
+                });
+            }
         }, 5000);
       }
 

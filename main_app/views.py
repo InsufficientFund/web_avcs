@@ -1,8 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .forms import UploadFileForm
 from django.conf import settings
 from django.core import serializers
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 import cv2
 import json
 import time
@@ -12,6 +14,7 @@ from neural_net import neural_net
 from models import CarsModel
 from models import ProgressModel
 from models import ResultModel
+from django.contrib.auth.models import User
 from save_db import save_result
 import glob
 import re
@@ -55,7 +58,7 @@ def handle_uploaded_file(f):
             destination.write(chunk)
     return filename
 
-
+@login_required(login_url='/main/login/')
 def train_page(request):
     if request.method == 'GET':
         return render(request, 'main_app/train_page.html')
@@ -355,8 +358,9 @@ def search_res(request):
         result_list = ResultModel.objects.filter(file_name=file_name, email=email)
         html = ''
         for result_object in result_list:
+            time_data = format(result_object.time + timedelta(hours=7), '%d/%m/%Y-%H:%M:%S')
             html += '<a href="/main/send_result?res='+result_object.unique_name+'&email='+result_object.email+'">'
-            html += result_object.file_name+'</a> '+format(result_object.time + timedelta(hours=7), '%d/%m/%Y-%H:%M:%S')+'<br>'
+            html += result_object.file_name+'</a> '+time_data+'<br>'
 
         return HttpResponse(html)
 
@@ -368,3 +372,47 @@ def send_result(request):
         file_name = unique_name[:unique_name.find('.csv')] + '.avi'
         send_mail(email, file_name)
         return HttpResponse('success')
+
+
+def login_view(request):
+    return render(request, 'main_app/login.html')
+
+
+def auth_and_login(request, onsuccess='/main/train_page/', onfail='/main/login/'):
+    user = authenticate(username=request.POST['username'], password=request.POST['password'])
+    if user is not None:
+        login(request, user)
+        return redirect(onsuccess)
+    else:
+        import ipdb; ipdb.set_trace()
+        return redirect(onfail)
+
+
+def logout_session(request):
+    logout(request)
+    return redirect('/main/login/')
+
+def result_image(request):
+    if request.method == 'GET':
+        video_name = request.GET.get('video_name')
+        suffix_name = '-'+video_name[:video_name.find('.avi')] + '.png'
+        html = '<div class="col-md-4">'
+        list_cars = glob.glob(settings.STATICFILES_DIRS[0]+'main_app/media/result_image/*0'+suffix_name)
+        for car in list_cars:
+            car_string = str(car)
+            car_src = car_string[car_string.find('/static'):]
+            html += '<img src="'+car_src+'"><br>'
+        html += '</div><div class="col-md-4">'
+        list_cars = glob.glob(settings.STATICFILES_DIRS[0]+'main_app/media/result_image/*1'+suffix_name)
+        for car in list_cars:
+            car_string = str(car)
+            car_src = car_string[car_string.find('/static'):]
+            html += '<img src="'+car_src+'"><br>'
+        html += '</div><div class="col-md-4">'
+        list_cars = glob.glob(settings.STATICFILES_DIRS[0]+'main_app/media/result_image/*2'+suffix_name)
+        for car in list_cars:
+            car_string = str(car)
+            car_src = car_string[car_string.find('/static'):]
+            html += '<img src="'+car_src+'"><br>'
+        html += '</div>'
+        return HttpResponse(html)

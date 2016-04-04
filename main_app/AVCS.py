@@ -184,7 +184,9 @@ class AVCS:
                             else:
                                 self.typeCar["large"] += 1
                             print answer
-
+                            file_name = self.video_name[:self.video_name.find('.avi')] + '.png'
+                            path = settings.STATICFILES_DIRS[0]+'main_app/media/result_image/'+str(num_car_detect)+'-'+str(answer)+'-'+file_name
+                            cv2.imwrite(path, crop_img)
                         lanes[numLane].remove(foundedObj)
 
                 for i in lanes[numLane]:
@@ -244,9 +246,9 @@ class AVCS:
             if cntStatus:
                 cv2.putText(res, 'lane1: '+str(totalCars[0]), (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
                 cv2.putText(res, 'lane2: '+str(totalCars[1]), (10, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (125, 0, 255), 2)
-                cv2.putText(res, 'truck/bus: '+str( self.typeCar["large"]), (400, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                cv2.putText(res, 'small car: '+str( self.typeCar["medium"]), (400, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
-                cv2.putText(res, 'motorcycle: '+str( self.typeCar["small"]), (400, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                cv2.putText(res, 'truck/bus: '+str(self.typeCar["large"]), (400, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                cv2.putText(res, 'small car: '+str(self.typeCar["medium"]), (400, 70), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+                cv2.putText(res, 'motorcycle: '+str(self.typeCar["small"]), (400, 110), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
 
             if showVid:
                 resMask = cv2.bitwise_and(frame, frame, mask=~self.fgMask)

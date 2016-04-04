@@ -46,61 +46,61 @@
     <body ng-app="MainApp">
         {% csrf_token %}
         <div class="main" ng-controller="MainController">
-          <div class="container-fluid">
-              <div class="row">
-                  <div class="col-md-5">
-                      <br>
-                      <pie-chart data="data" options="options" ng-if="has_graph_data"></pie-chart>
-                      <!--<div><input type="text" id="video_name"></div>-->
-                      <form enctype="multipart/form-data" method="post" action="/main/upload/" id="upload_form">
-                          {% for field in form %}
-                              <div class="fieldWrapper">
-                              {% csrf_token %}
-                              {{ field.errors }}
-                              {{ field.label_tag }} {{ field }}
-                              {% if field.help_text %}
-                                  <p class="help">{{ field.help_text|safe }}</p>
-                              {% endif %}
-                              </div>
-                          {% endfor %}
-                          <input type="submit" class="submit-post">
-                      </form>
-                      <br>
-                      <div class="row container-fluid">
-                          <form name="pointform" method="post">
-                              <div class="row">
-                                  <div class="col-md-6">
-                                      up&nbsp; left x = <input type="text" id="up_left_x"  name="up_left_x" size="4" />
-                                      y =    <input type="text" id="up_left_y"  name="up_left_y" size="4" />
-                                  </div>
-                                  <div class="col-md-6">
-                                      up&nbsp; right x = <input type="text" id="up_right_x"  name="up_right_x" size="4" />
-                                      y =  <input type="text" id="up_right_y"  name="up_right_y" size="4" /><br>
-                                  </div>
-                              </div>
-                              <div class="row">
-                                  <div class="col-md-6">
-                                      low left x = <input type="text" id="low_left_x"  name="low_left_x" size="4" />
-                                      y =  <input type="text" id="low_left_y"  name="low_left_y" size="4" /><br>
-                                  </div>
-                                  <div class="col-md-6">
-                                      low right x = <input type="text" id="low_right_x" name="low_right_x" size="4" />
-                                      y = <input type="text" id="low_right_y" name="low_right_y" size="4" />
-                                  </div>
-                              </div>
-                          </form>
-                      </div>
-                      <br>
-                      <div class="row container-fluid">
-                          <button type="button" class="btn btn-info" onclick="draw_line(event)">draw line</button>
-                          <button type="button" class="btn btn-warning" onclick="clear_line(event)">clear line</button>
-                          <button type="button" class="btn btn-primary" onclick="add_lane(event)">add lane</button>
-                          <button type="button" class="btn btn-danger" onclick="remove_lane(event)">clear lane</button>
-                      </div>
-                      <br>
-                      <div class="row container-fluid">
-                          <b>EMAIL: </b><input type="text" id="email"> <button type="button" class="btn btn-primary" ng-click="send_predict($event)">predict</button>
-                      </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-5">
+                        <br>
+                        <pie-chart data="data" options="options" ng-if="has_graph_data"></pie-chart>
+                        <!--<div><input type="text" id="video_name"></div>-->
+                        <form enctype="multipart/form-data" method="post" action="/main/upload/" id="upload_form">
+                            {% for field in form %}
+                                <div class="fieldWrapper">
+                                {% csrf_token %}
+                                {{ field.errors }}
+                                {{ field.label_tag }} {{ field }}
+                                {% if field.help_text %}
+                                    <p class="help">{{ field.help_text|safe }}</p>
+                                {% endif %}
+                                </div>
+                            {% endfor %}
+                            <input type="submit" class="submit-post">
+                        </form>
+                        <br>
+                        <div class="row container-fluid">
+                            <form name="pointform" method="post">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        up&nbsp; left x = <input type="text" id="up_left_x"  name="up_left_x" size="4" />
+                                        y =    <input type="text" id="up_left_y"  name="up_left_y" size="4" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        up&nbsp; right x = <input type="text" id="up_right_x"  name="up_right_x" size="4" />
+                                        y =  <input type="text" id="up_right_y"  name="up_right_y" size="4" /><br>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        low left x = <input type="text" id="low_left_x"  name="low_left_x" size="4" />
+                                        y =  <input type="text" id="low_left_y"  name="low_left_y" size="4" /><br>
+                                    </div>
+                                    <div class="col-md-6">
+                                        low right x = <input type="text" id="low_right_x" name="low_right_x" size="4" />
+                                        y = <input type="text" id="low_right_y" name="low_right_y" size="4" />
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <br>
+                        <div class="row container-fluid">
+                            <button type="button" class="btn btn-info" onclick="draw_line(event)">draw line</button>
+                            <button type="button" class="btn btn-warning" onclick="clear_line(event)">clear line</button>
+                            <button type="button" class="btn btn-primary" onclick="add_lane(event)">add lane</button>
+                            <button type="button" class="btn btn-danger" onclick="remove_lane(event)">clear lane</button>
+                        </div>
+                        <br>
+                        <div class="row container-fluid">
+                            <b>EMAIL: </b><input type="text" id="email"> <button type="button" class="btn btn-primary" ng-click="send_predict($event)">predict</button>
+                        </div>
 
                   </div>
                   <div class="col-md-7">
@@ -121,30 +121,63 @@
                         <linechart data="data_line" options="options_line"></linechart>
                       </div>
 
-                      <!-- Modal -->
-                      <div class="modal fade bs-example-modal-lg" id="get_lane_modal" tabindex="-1" role="dialog" aria-labelledby="get_lane_modal_label">
-                          <div class="modal-dialog modal-lg" role="document">
-                              <div class="modal-content">
-                                  <div class="modal-header">
-                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                      <h4 class="modal-title" id="get_lane_modal_label">Lane Coordinates</h4>
-                                  </div>
-                                  <div class="modal-body">
-                                      <div><h4 id="num_lane"></h4></div>
-                                      <hr>
-                                      <div id="lane">
+                        <!-- Modal -->
+                        <div class="modal fade bs-example-modal-lg" id="get_lane_modal" tabindex="-1" role="dialog" aria-labelledby="get_lane_modal_label">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="get_lane_modal_label">Lane Coordinates</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div><h4 id="num_lane"></h4></div>
+                                        <hr>
+                                        <div id="lane">
 
-                                      </div>
-                                  </div>
-                                  <div class="modal-footer">
-                                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal -->
+                        <div class="modal fade bs-example-modal-lg" id="result_modal" tabindex="-1" role="dialog" aria-labelledby="result_modal_label">
+                            <div class="modal-dialog modal-lg" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="result_modal_label">Result images</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <h4>Truck</h4>
+                                                <hr>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <h4>Passenger Cars</h4>
+                                                <hr>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <h4>Bike</h4>
+                                                <hr>
+                                            </div>
+                                        </div>
+                                        <div class="row" id="result">
+
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </body>
 </html>
