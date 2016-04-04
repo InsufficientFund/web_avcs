@@ -23,3 +23,4 @@ class ResultModel(models.Model):
     file_name = models.CharField(max_length=60)
     email = models.CharField(max_length=60)
     time = models.DateTimeField(default=datetime.now, blank=True)
+
