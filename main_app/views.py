@@ -220,8 +220,8 @@ def predict(request):
             #print elapsed_time
             pool = Pool(processes=1)
             result = pool.apply_async(asnyc_count, [json_data['email'], json_data['video_name'], lane_data])
-            pool.close()
-            pool.join()
+            # pool.close()
+            # pool.join()
             return HttpResponse('OK_OK')
 
 
@@ -260,14 +260,10 @@ def get_detect_status(request):
 
 def get_graph_data(request):
     if request.method == 'GET':
-        # all_obj = CarsModel.objects.all()
         file_name = request.GET.get('video_name')
-        # import ipdb; ipdb.set_trace()
-        # return_str = [str(obj) for obj in all_obj.values()]
         small_type_count = CarsModel.objects.filter(car_type='2',file_name=file_name).count()
         medium_type_count = CarsModel.objects.filter(car_type='1',file_name=file_name).count()
         large_type_count = CarsModel.objects.filter(car_type='0',file_name=file_name).count()
-        # return_str = serializers.serialize("json", all_obj)
         return_obj = {
             's': small_type_count,
             'm': medium_type_count,
@@ -275,17 +271,38 @@ def get_graph_data(request):
         }
 
         return HttpResponse(json.dumps(return_obj))
-        # return HttpResponse(return_str)
+
+def get_line_data(request):
+    if request.method == 'GET':
+        file_name = request.GET.get('video_name')
+        max_frame = int(request.GET.get('max_frame'))
+        return_obj = []
+
+        small_type_cars = CarsModel.objects.filter(car_type='2',file_name=file_name)
+        medium_type_cars = CarsModel.objects.filter(car_type='1',file_name=file_name)
+        large_type_cars = CarsModel.objects.filter(car_type='0',file_name=file_name)
+
+        for i in range(0,10):
+            round_result = {
+                's':0,
+                'm':0,
+                'l':0
+            }
+            loop_min_frame = max_frame*(i*10)/100
+            loop_max_frame = (max_frame*((i+1)*10)/100)
+            # frame_interval = (loop_min_frame, loop_max_frame)
+            round_result['s'] = small_type_cars.filter(frame__gte=loop_min_frame).filter(frame__lt=loop_max_frame).count()
+            round_result['m'] = medium_type_cars.filter(frame__gte=loop_min_frame).filter(frame__lt=loop_max_frame).count()
+            round_result['l'] = large_type_cars.filter(frame__gte=loop_min_frame).filter(frame__lt=loop_max_frame).count()
+            return_obj.append(round_result)
+
+
+
+        return HttpResponse(json.dumps(return_obj))
 
 def get_progress_data(request):
     if request.method == 'GET':
-        # all_obj = CarsModel.objects.all()
         file_name = request.GET.get('video_name')
-        # import ipdb; ipdb.set_trace()
-        # return_str = [str(obj) for obj in all_obj.values()]
-        # small_type_count = CarsModel.objects.filter(car_type='2',file_name=file_name).count()
-        # medium_type_count = CarsModel.objects.filter(car_type='1',file_name=file_name).count()
-        # large_type_count = CarsModel.objects.filter(car_type='0',file_name=file_name).count()
         try:
             progress_object = ProgressModel.objects.get(pk=file_name)
             return_obj = {
@@ -297,15 +314,7 @@ def get_progress_data(request):
                 'progress': 0,
                 'max_frame': 0,
             }
-        # return_str = serializers.serialize("json", all_obj)
-        # return_obj = {
-        #     's': small_type_count,
-        #     'm': medium_type_count,
-        #     'l': large_type_count,
-        # }
-
         return HttpResponse(json.dumps(return_obj))
-        # return HttpResponse(return_str)
 
 def send_mail(dest, file_name):
     key = 'key-c4b7a856e0a88accf4d3fcf4f7187097'
@@ -359,4 +368,3 @@ def send_result(request):
         file_name = unique_name[:unique_name.find('.csv')] + '.avi'
         send_mail(email, file_name)
         return HttpResponse('success')
-

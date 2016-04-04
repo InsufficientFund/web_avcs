@@ -1,3 +1,21 @@
+$(document).ready(function() {
+$('#lane_button').click(function() {
+    var lane = JSON.parse(sessionStorage.getItem("lane"));
+    var html = '';
+    for (x in lane){
+        html += '<div class="row"><div class="col-md-3"> up left: '+lane[x]['up_left'][0]+', '+lane[x]['up_left'][1]+'</div>'
+        html += '<div class="col-md-3"> up right: '+lane[x]['up_right'][0]+', '+lane[x]['up_right'][1]+'</div>'
+        html += '<div class="col-md-3"> low left: '+lane[x]['low_left'][0]+', '+lane[x]['low_left'][1]+'</div>'
+        html += '<div class="col-md-3"> low right: '+lane[x]['low_right'][0]+', '+lane[x]['low_right'][1]+'</div></div>'
+    }
+    var num_lane = 0;
+    if (lane){
+        num_lane = lane.length
+    }
+    $('#num_lane').html('Total lanes :' + num_lane);
+    $('#lane').html(html);
+});});
+
 function point_it(event){
 	pos_x = event.offsetX?(event.offsetX):event.pageX-document.getElementById("pointer_div").offsetLeft;
 	pos_y = event.offsetY?(event.offsetY):event.pageY-document.getElementById("pointer_div").offsetTop;
@@ -90,20 +108,3 @@ function add_lane(event){
 function remove_lane(event){
     sessionStorage.removeItem('lane');
 }
-
-$('#lane_button').click(function() {
-    var lane = JSON.parse(sessionStorage.getItem("lane"));
-    var html = '';
-    for (x in lane){
-        html += '<div class="row"><div class="col-md-3"> up left: '+lane[x]['up_left'][0]+', '+lane[x]['up_left'][1]+'</div>'
-        html += '<div class="col-md-3"> up right: '+lane[x]['up_right'][0]+', '+lane[x]['up_right'][1]+'</div>'
-        html += '<div class="col-md-3"> low left: '+lane[x]['low_left'][0]+', '+lane[x]['low_left'][1]+'</div>'
-        html += '<div class="col-md-3"> low right: '+lane[x]['low_right'][0]+', '+lane[x]['low_right'][1]+'</div></div>'
-    }
-    var num_lane = 0;
-    if (lane){
-        num_lane = lane.length
-    }
-    $('#num_lane').html('Total lanes :' + num_lane);
-    $('#lane').html(html);
-});

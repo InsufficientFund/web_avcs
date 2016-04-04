@@ -35,6 +35,13 @@
         <script src="{% static 'js/ajax_csrf_handle.js' %}"></script>
         <script src="{% static 'js/lane_handle.js' %}"></script>
         <script src="{% static 'js/predict_page.js' %}"></script>
+
+        <style>
+        .container {
+          width: 888px;
+          height: 400px;
+          }
+        </style>
     </head>
     <body ng-app="MainApp">
         {% csrf_token %}
@@ -100,7 +107,7 @@
                       <br>
                       <div id="video_name" hidden></div>
                       <canvas id="pointer_div" onclick="point_it(event)" width="640" height="480"
-                              style = "background-color:#6E6E6E;border:1px solid black">
+                              style = "background-color:#6E6E6E;border:1px solid black" ng-if="!is_predicting">
                           <!--<img src="{% static 'main_app/media/tesf.png' %}" id="cross" >-->
                           <img  id="cross" style="position:relative;visibility:hidden;z-index:2;">
                       </canvas>
@@ -109,6 +116,9 @@
                           <button type="button" class="btn btn-primary " data-toggle="modal" id="lane_button" data-target="#get_lane_modal">
                               Show Lanes
                           </button>
+                      </div>
+                      <div class="container" ng-if="is_predicting">
+                        <linechart data="data_line" options="options_line"></linechart>
                       </div>
 
                       <!-- Modal -->

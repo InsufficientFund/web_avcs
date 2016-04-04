@@ -7,4 +7,5 @@ static/main_app/media/train_image/sample/*.png
 static/main_app/media/sample_image/*.png
 static/main_app/*
 static/media/*
+static/pie-chart/*
 main_app/migrations/*
