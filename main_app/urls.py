@@ -12,5 +12,9 @@ urlpatterns = [
     url(r'^detect/', views.detect, name='detect'),
     url(r'^imp_data/', views.improve_data, name='improve_data'),
     url(r'^predict/', views.predict, name='predict'),
+    url(r'^resend/', views.resend_data, name='resend_data'),
+    url(r'^search_res/', views.search_res, name='search_res'),
+    url(r'^send_result/', views.send_result, name='send_result'),
     url(r'^$', views.index, name='index'),
+
 ]

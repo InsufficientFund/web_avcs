@@ -4,7 +4,6 @@ from .forms import UploadFileForm
 from django.conf import settings
 from django.core import serializers
 import cv2
-import base64
 import json
 import time
 from AVCS import AVCS
@@ -12,6 +11,8 @@ from lbp_feature import lbp_feature
 from neural_net import neural_net
 from models import CarsModel
 from models import ProgressModel
+from models import ResultModel
+from save_db import save_result
 import glob
 import re
 import csv
@@ -19,8 +20,7 @@ import os
 import uuid
 import requests
 from multiprocessing import Pool
-
-
+from datetime import timedelta
 
 def index(request):
     form = UploadFileForm()
@@ -32,6 +32,9 @@ def upload(request):
         form = UploadFileForm(request.POST, request.FILES)
         if form.is_valid():
             filename = handle_uploaded_file(request.FILES['file'])
+            result_name = filename[:filename.find('.avi')] + '.csv'
+            upload_name = request.FILES['file'].name
+            save_result(result_name, upload_name, '')
             return HttpResponse(filename)
         else:
             return HttpResponse("Invalid")
@@ -217,13 +220,15 @@ def predict(request):
             #print elapsed_time
             pool = Pool(processes=1)
             result = pool.apply_async(asnyc_count, [json_data['email'], json_data['video_name'], lane_data])
-
+            pool.close()
+            pool.join()
             return HttpResponse('OK_OK')
 
 
 def asnyc_count(dest, file_name, lane_data):
     counter = AVCS()
     video_path = settings.MEDIA_ROOT+'upload/' + file_name
+    result_name = file_name[:file_name.find('.avi')] + '.csv'
     counter.readVideo(video_path, file_name)
     for lane in lane_data:
         up_left = tuple(map(int,lane["up_left"]))
@@ -232,7 +237,17 @@ def asnyc_count(dest, file_name, lane_data):
         low_right = tuple(map(int,lane["low_right"]))
         counter.addLane(up_left, up_right, low_left, low_right)
     counter.run(mode='predict', cntStatus=False, showVid=False)
+    result_type = ['truck', 'passenger car', 'bike']
+    raw_feature = CarsModel.objects.filter(file_name=file_name).values_list('frame', 'car_type')
+    feature_list = [[x[0], result_type[int(x[1])]] for x in raw_feature]
+    with open(settings.MEDIA_ROOT+"result_data/"+result_name, 'w') as fp:
+        a = csv.writer(fp, delimiter=',')
+        a.writerows(feature_list)
+    fp.close()
+    ResultModel.objects.filter(pk=result_name).update(email=dest)
+
     send_mail(dest, file_name)
+    return 0
 
 
 def get_detect_status(request):
@@ -297,9 +312,9 @@ def send_mail(dest, file_name):
     sandbox = 'sandbox3e44ff53154a450faa54ffdf485d7bc4.mailgun.org'
     recipient = dest
 
-    small_count = CarsModel.objects.filter(car_type='2',file_name=file_name).count()
-    medium_count = CarsModel.objects.filter(car_type='1',file_name=file_name).count()
-    large_count = CarsModel.objects.filter(car_type='0',file_name=file_name).count()
+    small_count = CarsModel.objects.filter(car_type='2', file_name=file_name).count()
+    medium_count = CarsModel.objects.filter(car_type='1', file_name=file_name).count()
+    large_count = CarsModel.objects.filter(car_type='0', file_name=file_name).count()
 
     send_text = 'Total cars: ' + str(small_count+medium_count+large_count)+ '\nTotal'\
                 ' Trucks: ' + str(large_count)+ '\nTotal '\
@@ -312,7 +327,36 @@ def send_mail(dest, file_name):
         'to': recipient,
         'subject': 'Predicted result',
         'text': send_text
-    })
+        },
+        files=[('attachment', open(settings.MEDIA_ROOT+'result_data/'+file_name[:file_name.find('.avi')] + '.csv')), ],)
 
     print 'Status: {0}'.format(request.status_code)
     print 'Body:   {0}'.format(request.text)
+
+
+def resend_data(request):
+    if request.method == 'GET':
+        return render(request, 'main_app/resend.html')
+
+
+def search_res(request):
+    if request.method == 'GET':
+        email = request.GET.get('email')
+        file_name = request.GET.get('file')
+        result_list = ResultModel.objects.filter(file_name=file_name, email=email)
+        html = ''
+        for result_object in result_list:
+            html += '<a href="/main/send_result?res='+result_object.unique_name+'&email='+result_object.email+'">'
+            html += result_object.file_name+'</a> '+format(result_object.time + timedelta(hours=7), '%d/%m/%Y-%H:%M:%S')+'<br>'
+
+        return HttpResponse(html)
+
+
+def send_result(request):
+    if request.method == 'GET':
+        unique_name = request.GET.get('res')
+        email = request.GET.get('email')
+        file_name = unique_name[:unique_name.find('.csv')] + '.avi'
+        send_mail(email, file_name)
+        return HttpResponse('success')
+
