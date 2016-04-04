@@ -81,9 +81,9 @@ WSGI_APPLICATION = 'web_AVCS.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'devsonk',
-        'USER': 'sonk',
-        'PASSWORD': 'sonksamsi',
+        'NAME': 'mydb',
+        'USER': 'westlife',
+        'PASSWORD': '9278112lyl',
         'HOST': 'localhost',
         'PORT': '',
     }
