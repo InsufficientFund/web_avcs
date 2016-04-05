@@ -223,8 +223,8 @@ def predict(request):
             #print elapsed_time
             pool = Pool(processes=1)
             result = pool.apply_async(asnyc_count, [json_data['email'], json_data['video_name'], lane_data])
-            # pool.close()
-            # pool.join()
+            pool.close()
+            pool.join()
             return HttpResponse('OK_OK')
 
 

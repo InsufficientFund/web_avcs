@@ -50,58 +50,62 @@
                 <div class="row">
                     <div class="col-md-5">
                         <br>
-                        <pie-chart data="data" options="options" ng-if="has_graph_data"></pie-chart>
-                        <!--<div><input type="text" id="video_name"></div>-->
-                        <form enctype="multipart/form-data" method="post" action="/main/upload/" id="upload_form">
-                            {% for field in form %}
-                                <div class="fieldWrapper">
-                                {% csrf_token %}
-                                {{ field.errors }}
-                                {{ field.label_tag }} {{ field }}
-                                {% if field.help_text %}
-                                    <p class="help">{{ field.help_text|safe }}</p>
-                                {% endif %}
-                                </div>
-                            {% endfor %}
-                            <input type="submit" class="submit-post">
-                        </form>
-                        <br>
-                        <div class="row container-fluid">
-                            <form name="pointform" method="post">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        up&nbsp; left x = <input type="text" id="up_left_x"  name="up_left_x" size="4" />
-                                        y =    <input type="text" id="up_left_y"  name="up_left_y" size="4" />
+                        <br />
+                        <br />
+                        <div class="container">
+                          <pie-chart data="data" options="options" ng-if="has_graph_data"></pie-chart>
+                          <div ng-if="!is_predicting">
+                            <form enctype="multipart/form-data" method="post" action="/main/upload/" id="upload_form">
+                                {% for field in form %}
+                                    <div class="fieldWrapper">
+                                    {% csrf_token %}
+                                    {{ field.errors }}
+                                    {{ field.label_tag }} {{ field }}
+                                    {% if field.help_text %}
+                                        <p class="help">{{ field.help_text|safe }}</p>
+                                    {% endif %}
                                     </div>
-                                    <div class="col-md-6">
-                                        up&nbsp; right x = <input type="text" id="up_right_x"  name="up_right_x" size="4" />
-                                        y =  <input type="text" id="up_right_y"  name="up_right_y" size="4" /><br>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        low left x = <input type="text" id="low_left_x"  name="low_left_x" size="4" />
-                                        y =  <input type="text" id="low_left_y"  name="low_left_y" size="4" /><br>
-                                    </div>
-                                    <div class="col-md-6">
-                                        low right x = <input type="text" id="low_right_x" name="low_right_x" size="4" />
-                                        y = <input type="text" id="low_right_y" name="low_right_y" size="4" />
-                                    </div>
-                                </div>
+                                {% endfor %}
+                                <input type="submit" class="submit-post">
                             </form>
+                            <br>
+                            <div class="row container-fluid">
+                                <form name="pointform" method="post">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            up&nbsp; left x = <input type="text" id="up_left_x"  name="up_left_x" size="4" />
+                                            y =    <input type="text" id="up_left_y"  name="up_left_y" size="4" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            up&nbsp; right x = <input type="text" id="up_right_x"  name="up_right_x" size="4" />
+                                            y =  <input type="text" id="up_right_y"  name="up_right_y" size="4" /><br>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            low left x = <input type="text" id="low_left_x"  name="low_left_x" size="4" />
+                                            y =  <input type="text" id="low_left_y"  name="low_left_y" size="4" /><br>
+                                        </div>
+                                        <div class="col-md-6">
+                                            low right x = <input type="text" id="low_right_x" name="low_right_x" size="4" />
+                                            y = <input type="text" id="low_right_y" name="low_right_y" size="4" />
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                          <br>
+                          <div class="row container-fluid">
+                              <button type="button" class="btn btn-info" onclick="draw_line(event)">draw line</button>
+                              <button type="button" class="btn btn-warning" onclick="clear_line(event)">clear line</button>
+                              <button type="button" class="btn btn-primary" onclick="add_lane(event)">add lane</button>
+                              <button type="button" class="btn btn-danger" onclick="remove_lane(event)">clear lane</button>
+                          </div>
+                          <br>
+                          <div class="row container-fluid">
+                              <b>EMAIL: </b><input type="text" id="email"> <button type="button" class="btn btn-primary" ng-click="send_predict($event)">predict</button>
+                          </div>
                         </div>
-                        <br>
-                        <div class="row container-fluid">
-                            <button type="button" class="btn btn-info" onclick="draw_line(event)">draw line</button>
-                            <button type="button" class="btn btn-warning" onclick="clear_line(event)">clear line</button>
-                            <button type="button" class="btn btn-primary" onclick="add_lane(event)">add lane</button>
-                            <button type="button" class="btn btn-danger" onclick="remove_lane(event)">clear lane</button>
-                        </div>
-                        <br>
-                        <div class="row container-fluid">
-                            <b>EMAIL: </b><input type="text" id="email"> <button type="button" class="btn btn-primary" ng-click="send_predict($event)">predict</button>
-                        </div>
-
+                      </div>
                   </div>
                   <div class="col-md-7">
                       <br>
@@ -112,14 +116,19 @@
                           <img  id="cross" style="position:relative;visibility:hidden;z-index:2;">
                       </canvas>
                       <div id="pos_select" hidden>0</div>
+                      <br /><br /><br />
+                      <div class="container" ng-if="is_predicting">
+                        <linechart data="data_line" options="options_line"></linechart>
+                      </div>
+                      <br /><br />
                       <div class="row container-fluid">
                           <button type="button" class="btn btn-primary " data-toggle="modal" id="lane_button" data-target="#get_lane_modal">
                               Show Lanes
                           </button>
-                      </div>
-                      <div class="container" ng-if="is_predicting">
-                        <linechart data="data_line" options="options_line"></linechart>
-                      </div>
+                          <button type="button" class="btn btn-primary " data-toggle="modal" id="result_button" data-target="#result_modal">
+                              Result Images
+                          </button>
+                      </div
 
                         <!-- Modal -->
                         <div class="modal fade bs-example-modal-lg" id="get_lane_modal" tabindex="-1" role="dialog" aria-labelledby="get_lane_modal_label">

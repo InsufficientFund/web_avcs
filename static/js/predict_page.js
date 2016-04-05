@@ -48,17 +48,17 @@ app.controller('MainController', ['$scope', '$http', '$interval', 'ngProgressFac
     $scope.is_predicting = false;
     $scope.data_line = {
         dataset0: [
-          {x: 0, s_car: 1, m_car: 2, l_car: 0},
-          {x: 1, s_car: 2, m_car: 4, l_car: 1},
-          {x: 2, s_car: 3, m_car: 8, l_car: 1},
-          {x: 3, s_car: 4, m_car: 16, l_car: 2},
-          {x: 4, s_car: 5, m_car: 32, l_car: 2},
-          {x: 5, s_car: 6, m_car: 32, l_car: 3},
-          {x: 6, s_car: 7, m_car: 18, l_car: 3},
-          {x: 7, s_car: 8, m_car: 8, l_car: 4},
-          {x: 8, s_car: 9, m_car: 6, l_car: 4},
-          {x: 9, s_car: 10, m_car: 4, l_car: 5},
-          {x: 10, s_car: 11, m_car: 0, l_car: 5},
+          {x: 0, s_car: 0, m_car: 0, l_car: 0},
+          {x: 1, s_car: 0, m_car: 0, l_car: 0},
+          {x: 2, s_car: 0, m_car: 0, l_car: 0},
+          {x: 3, s_car: 0, m_car: 0, l_car: 0},
+          {x: 4, s_car: 0, m_car: 0, l_car: 0},
+          {x: 5, s_car: 0, m_car: 0, l_car: 0},
+          {x: 6, s_car: 0, m_car: 0, l_car: 0},
+          {x: 7, s_car: 0, m_car: 0, l_car: 0},
+          {x: 8, s_car: 0, m_car: 0, l_car: 0},
+          {x: 9, s_car: 0, m_car: 0, l_car: 0},
+          {x: 10, s_car: 0, m_car: 0, l_car: 0},
         ]
     };
 
@@ -68,8 +68,8 @@ app.controller('MainController', ['$scope', '$http', '$interval', 'ngProgressFac
           axis: "y",
           dataset: "dataset0",
           key: "s_car",
-          label: "An area series",
-          color: "rgb(126, 181, 63)",
+          label: "Bikes",
+          color: "rgb(255, 0, 0)",
           type: ['line', 'dot'],
           id: 'mySeries0'
         },
@@ -77,8 +77,8 @@ app.controller('MainController', ['$scope', '$http', '$interval', 'ngProgressFac
           axis: "y",
           dataset: "dataset0",
           key: "m_car",
-          label: "An area series",
-          color: "rgb(200, 96, 69)",
+          label: "Passenger cars",
+          color: "rgb(0, 255, 0)",
           type: ['line', 'dot'],
           id: 'mySeries1'
         },
@@ -86,13 +86,16 @@ app.controller('MainController', ['$scope', '$http', '$interval', 'ngProgressFac
           axis: "y",
           dataset: "dataset0",
           key: "l_car",
-          label: "An area series",
-          color: "rgb(119, 48, 131)",
+          label: "Truck",
+          color: "rgb(0, 0, 255)",
           type: ['line', 'dot'],
           id: 'mySeries2'
         }
       ],
-      axes: {x: {key: "x"}}
+      axes: {x: {key: "x"}},
+      margin: {
+        top: 20
+      }
     };
     $scope.options = {thickness: 10};
     $scope.max_frame = 0 ;
@@ -155,7 +158,6 @@ app.controller('MainController', ['$scope', '$http', '$interval', 'ngProgressFac
                         $scope.data_line['dataset0'][i+1]['m_car'] = response['data'][i]['m']
                         $scope.data_line['dataset0'][i+1]['l_car'] = response['data'][i]['l']
                     }
-                    console.log($scope.data_line)
                 });
               }
                 $.ajax({
