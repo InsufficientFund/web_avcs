@@ -22,7 +22,6 @@ import csv
 import os
 import uuid
 import requests
-from multiprocessing import Pool
 from datetime import timedelta
 
 def index(request):
@@ -199,36 +198,16 @@ def get_sample_frame(request):
 def predict(request):
     if request.is_ajax():
         if request.method == 'POST':
-            #print 'Raw Data: "%s"' % request.body
             json_data = json.loads(request.body)
             print json_data
-            #counter = AVCS()
             video_path = settings.MEDIA_ROOT+'upload/' + json_data['video_name']
             print video_path
-            #counter.readVideo(video_path, json_data['video_name'])
-            # counter.addLane((131, 142), (203, 142), (123, 245), (213, 245))
-            # counter.addLane((205, 142), (275, 142), (215, 245), (316, 245))
-            # counter.addLane((155, 182), (225, 182), (123, 285), (232, 285))
-            # counter.addLane((227, 182), (302, 182), (234, 285), (356, 285))
             lane_data = json.loads(json_data['data'])
-            # for lane in lane_data:
-            #     up_left = tuple(map(int,lane["up_left"]))
-            #     up_right = tuple(map(int,lane["up_right"]))
-            #     low_left = tuple(map(int,lane["low_left"]))
-            #     low_right = tuple(map(int,lane["low_right"]))
-            #     counter.addLane(up_left, up_right, low_left, low_right)
-            # start_time = time.time()
-            # counter.run(mode='predict', cntStatus=False, showVid=False)
-            # elapsed_time = time.time() - start_time
-            #print elapsed_time
-            pool = Pool(processes=1)
-            result = pool.apply_async(asnyc_count, [json_data['email'], json_data['video_name'], lane_data])
-            pool.close()
-            pool.join()
+            apply_count(json_data['email'], json_data['video_name'], lane_data)
             return HttpResponse('OK_OK')
 
 
-def asnyc_count(dest, file_name, lane_data):
+def apply_count(dest, file_name, lane_data):
     counter = AVCS()
     video_path = settings.MEDIA_ROOT+'upload/' + file_name
     result_name = file_name[:file_name.find('.avi')] + '.csv'
@@ -239,6 +218,7 @@ def asnyc_count(dest, file_name, lane_data):
         low_left = tuple(map(int,lane["low_left"]))
         low_right = tuple(map(int,lane["low_right"]))
         counter.addLane(up_left, up_right, low_left, low_right)
+    #import ipdb; ipdb.set_trace()
     counter.run(mode='predict', cntStatus=False, showVid=False)
     result_type = ['truck', 'passenger car', 'bike']
     raw_feature = CarsModel.objects.filter(file_name=file_name).values_list('frame', 'car_type')
