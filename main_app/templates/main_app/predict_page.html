@@ -53,6 +53,7 @@
                         <br />
                         <br />
                         <div class="container">
+                          <button class="btn btn-primary" onclick="window.location='/main'"> main	</button>
                           <pie-chart data="data" options="options" ng-if="has_graph_data"></pie-chart>
                           <div ng-if="!is_predicting">
                             <form enctype="multipart/form-data" method="post" action="/main/upload/" id="upload_form">

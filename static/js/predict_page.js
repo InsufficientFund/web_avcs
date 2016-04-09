@@ -12,6 +12,7 @@ function select_video(){
 function upload(event) {
     event.preventDefault();
     var data = new FormData($('#upload_form').get(0));
+    $('#upload_form').children().prop('disabled', true);
 
     $.ajax({
         url: $(this).attr('action'),
@@ -21,6 +22,7 @@ function upload(event) {
         processData: false,
         contentType: false,
         success: function(data) {
+            $('#upload_form').children().prop('disabled', false);
             $("#video_name").html(data);
             select_video();
         }
@@ -38,6 +40,7 @@ app.config(function($interpolateProvider){
 });
 app.controller('MainController', ['$scope', '$http', '$interval', 'ngProgressFactory' ,function($scope,$http,$interval, ngProgressFactory) {
     $scope.title = 'Top Sellers in Books';
+    $scope.is_submitted = false;
     $scope.progressbar = ngProgressFactory.createInstance();
     $scope.progressbar.setHeight('10px');
     $scope.data = [
@@ -116,7 +119,9 @@ app.controller('MainController', ['$scope', '$http', '$interval', 'ngProgressFac
             },
         });
 
-
+      a = $interval(function(){
+        console.log($scope.is_submitted);
+      },1000);
       stop = $interval(function() {
           $scope.vid_name = $('#video_name').html()
           if($scope.vid_name != "" ){

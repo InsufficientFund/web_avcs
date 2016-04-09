@@ -4,34 +4,38 @@
 <head>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
 	<!-- <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet"> -->
-	<title>ABCDEFG</title>
+	<title>Auto Vehicle Counting System</title>
 </head>
 <body>
-<h1>PUT YOUR HAND UP !</h1>
-<div class="row">
-	<div class="col-md-6">
-		
-		<button class="btn-danger">ABCD</button>
-	</div>
-	<div class="col-md-6">
-		<button class="btn-warning">ABCD</button>
-		<form enctype="multipart/form-data" method="post" action="/main/upload/">
-		<!-- 	{{ form.title }}
-			{{ form.file  }}
-		 -->
-		{% for field in form %}
-            <div class="fieldWrapper">
-                {% csrf_token %}
-        		{{ field.errors }}
-                {{ field.label_tag }} {{ field }}
-    			{% if field.help_text %}
-        			<p class="help">{{ field.help_text|safe }}</p>
-                {% endif %}
-            </div>
-        {% endfor %}
-                <input type="submit" class="submit-post">   
-</form>
-	</div>	
+<div class='row'>
+	<h1></h1>
 </div>
+<div class="row">
+	<div class="col-md-3 col-md-offset-1">
+		<button class="btn btn-danger" style="width: 100%;height: 80vh;" onclick="window.location='predict_page'">
+			<div class="glyphicon glyphicon-film" style="width: 80%;height: 40%; font-size: 10em;"></div>
+			<h1>	Predict </h1>
+		</button>
+	</div>
+	<div class='col-md-3' style="left:4%">
+		<button class="btn btn-warning" style="width: 100%;height: 80vh;" onclick="window.location='train_page'">
+			<div class='glyphicon glyphicon-wrench' style="width: 80%;height: 40%; font-size: 10em;"></div>
+			<h1> Train </h1>
+		</button>
+	</div>
+	<div class='col-md-3 col-md-pull-1 pull-right'>
+		<button class="btn btn-success" style="width: 100%;height: 80vh;" onclick="window.location='resend'">
+			<div class="glyphicon glyphicon-envelope" style="width: 80%;height: 40%; font-size: 10em;"></div>
+			<h1>	Result Resend	</h1>
+		</button>
+	</div>
+</div>
+
 </body>
+<style>
+.col-centered{
+	float: none;
+	margin: 0 auto;
+}
+</style>
 </html>
