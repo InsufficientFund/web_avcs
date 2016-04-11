@@ -24,3 +24,8 @@ class ResultModel(models.Model):
     email = models.CharField(max_length=60)
     time = models.DateTimeField(default=datetime.now, blank=True)
 
+
+class StateModel(models.Model):
+    """docstring for StateModel"""
+    state_name = models.CharField(max_length=60, primary_key=True)
+    status = models.BooleanField()

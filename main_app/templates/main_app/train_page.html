@@ -24,13 +24,27 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-5">
-                    <a href="/main/logout/">logout</a>
+                    <a href="/main/logout/">logout</a> |
+                    <a href="/main/chgpwd/">Change Password</a>
                     <br>
                     <button class="btn btn-primary" onclick="window.location='/main'"> main	</button>
                     <!--<div><input type="text" id="video_name"></div>-->
                     <div>
-                        <b>file :</b> <input type="text" id="video_name">
-                        <button type="button" class="btn btn-primary" onclick="select_video(event)">send</button>
+                        <div hidden id="video_name"></div>
+                        <!-- <button type="button" class="btn btn-primary" onclick="select_video(event)">send</button> -->
+                        <form enctype="multipart/form-data" method="post" action="/main/upload_train/" id="upload_form">
+                            {% for field in form %}
+                                <div class="fieldWrapper">
+                                {% csrf_token %}
+                                {{ field.errors }}
+                                {{ field.label_tag }} {{ field }}
+                                {% if field.help_text %}
+                                    <p class="help">{{ field.help_text|safe }}</p>
+                                {% endif %}
+                                </div>
+                            {% endfor %}
+                            <input type="submit" class="submit-post">
+                        </form>
                     </div>
 
                     <div class="row container-fluid">

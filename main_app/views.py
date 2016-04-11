@@ -14,6 +14,7 @@ from neural_net import neural_net
 from models import CarsModel
 from models import ProgressModel
 from models import ResultModel
+from models import StateModel
 from django.contrib.auth.models import User
 from save_db import save_result
 import glob
@@ -23,6 +24,7 @@ import os
 import uuid
 import requests
 from datetime import timedelta
+from django.contrib.auth.models import User
 
 def index(request):
     form = UploadFileForm()
@@ -60,7 +62,8 @@ def handle_uploaded_file(f):
 @login_required(login_url='/main/login/')
 def train_page(request):
     if request.method == 'GET':
-        return render(request, 'main_app/train_page.html')
+        form = UploadFileForm()
+        return render(request, 'main_app/train_page.html',  {'form': form})
 
 
 def atoi(text):
@@ -69,6 +72,35 @@ def atoi(text):
 
 def natural_keys(text):
     return [atoi(c) for c in re.split('(\d+)', text)]
+
+
+def upload_train(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            filename = handle_uploaded_train(request.FILES['file'])
+            result_name = filename[:filename.find('.avi')] + '.csv'
+            upload_name = request.FILES['file'].name
+            save_result(result_name, upload_name, '')
+            return HttpResponse(filename)
+        else:
+            return HttpResponse("Invalid")
+    else:
+        form = UploadFileForm()
+        return HttpResponse("failed")
+    # return render(request, 'upload.html', {'form': form})
+
+
+    # return HttpResponse("Hello, world. You're at the polls index.")
+# Create your views here.
+
+def handle_uploaded_train(f):
+    ext = f.name.split('.')[-1]
+    filename = "%s.%s" % (uuid.uuid4(), ext)
+    with open(settings.STATICFILES_DIRS[0]+'main_app/media/train_video/'+filename, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+    return filename
 
 
 def select_video(request):
@@ -157,6 +189,9 @@ def train(request):
     if request.is_ajax():
         if request.method == 'GET':
             print 'train func'
+            db = StateModel(state_name='lock_model', status=1)
+            db.save()
+
             neural_network = neural_net(75, 3)
             neural_network.create_struct(150)
             # file_train = '/home/sayong/Project/AVCS/Car-counter-using-python-opencv/list_data_raw.csv'
@@ -170,13 +205,19 @@ def train(request):
             neural_network.save_model(settings.STATICFILES_DIRS[0])
             #print neural_network.predict(test_data[0])
             #print test_answer[0]
+            db = StateModel(state_name='lock_model', status=0)
+            db.save()
             return HttpResponse('OK')
 
 
 def predict_page(request):
     if request.method == 'GET':
-        form = UploadFileForm()
-        return render(request, 'main_app/predict_page.html',  {'form': form})
+        state = StateModel.objects.get(pk='lock_model')
+        if not state.status:
+            form = UploadFileForm()
+            return render(request, 'main_app/predict_page.html',  {'form': form})
+        else:
+            return render(request, 'main_app/construct.html')
 
 
 def get_sample_frame(request):
@@ -364,7 +405,21 @@ def auth_and_login(request, onsuccess='/main/train_page/', onfail='/main/login/'
         login(request, user)
         return redirect(onsuccess)
     else:
-        import ipdb; ipdb.set_trace()
+        return redirect(onfail)
+
+
+def change_password_view(request):
+    return render(request, 'main_app/change_password.html')
+
+
+def change_password(request, onsuccess='/main/login/', onfail='/main/chgpwd/'):
+    user = authenticate(username='admin', password=request.POST['password'])
+    if user is not None:
+        #user = User.objects.filter(username='admin')
+        user.set_password(request.POST['new_password'])
+        user.save()
+        return redirect(onsuccess)
+    else:
         return redirect(onfail)
 
 

@@ -1,7 +1,33 @@
+function upload(event) {
+    event.preventDefault();
+    var data = new FormData($('#upload_form').get(0));
+    $('#upload_form').children().prop('disabled', true);
+
+    $.ajax({
+        url: $(this).attr('action'),
+        type: $(this).attr('method'),
+        data: data,
+        cache: false,
+        processData: false,
+        contentType: false,
+        success: function(data) {
+            $('#upload_form').children().prop('disabled', false);
+            $("#video_name").html(data);
+            select_video();
+        }
+    });
+    return false;
+}
+
+$(function() {
+    $('#upload_form').submit(upload);
+});
+
+
 function select_video(){
     $.ajax({
         url: '/main/select_video/',
-        data: {video_name:$("#video_name").val()},
+        data: {video_name:$("#video_name").html()},
         contentType: "application/json",
     }).done(function(data) {
         $('#pointer_div').attr('style', 'background-image:url("/static/main_app/media/' +data+'");border:1px solid black');
@@ -12,7 +38,7 @@ function select_video(){
 function detect_cmd(event){
     var json_data = {}
     json_data["data"] = sessionStorage.getItem('lane');
-    json_data["video_name"] = $("#video_name").val();
+    json_data["video_name"] = $("#video_name").html();
     $.ajax({
         url: "/main/detect/",
         type: "POST",

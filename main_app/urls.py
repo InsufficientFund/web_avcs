@@ -20,6 +20,9 @@ urlpatterns = [
     url(r'^logout/', views.logout_session, name='logout_session'),
     url(r'^auth/', views.auth_and_login, name='auth_and_login'),
     url(r'^result_image/', views.result_image, name='result_image'),
+    url(r'^chgpwd_opt/', views.change_password, name='change_password'),
+    url(r'^chgpwd/', views.change_password_view, name='change_password_view'),
+    url(r'^upload_train/', views.upload_train, name='upload_train'),
     url(r'^$', views.index, name='index'),
 
 ]
