@@ -25,6 +25,7 @@ import uuid
 import requests
 from datetime import timedelta
 from django.contrib.auth.models import User
+from lda import LDA
 
 def index(request):
     form = UploadFileForm()
@@ -192,17 +193,20 @@ def train(request):
             db = StateModel(state_name='lock_model', status=1)
             db.save()
 
-            neural_network = neural_net(75, 3)
-            neural_network.create_struct(150)
-            # file_train = '/home/sayong/Project/AVCS/Car-counter-using-python-opencv/list_data_raw.csv'
-            # file_test = '/home/sayong/Project/AVCS/Car-counter-using-python-opencv/list_test_raw.csv'
+            # neural_network = neural_net(75, 3)
+            # neural_network.create_struct(150)
             file_train = settings.STATICFILES_DIRS[0]+'main_app/media/train_data.csv'
+
+            lda = LDA(75,3)
             #neural_network.data_input(feature_list, answer, "train")
-            neural_network.file_input(file_train)
+            #neural_network.file_input(file_train)
+            lda.file_input(file_train)
             #neural_network.file_input(file_test, type_set='test')
             #test_data, test_answer = neural_network.get_test_data()
-            neural_network.training(5000)
-            neural_network.save_model(settings.STATICFILES_DIRS[0])
+            # neural_network.training(5000)
+            # neural_network.save_model(settings.STATICFILES_DIRS[0])
+            lda.training()
+            lda.save_model(settings.STATICFILES_DIRS[0])
             #print neural_network.predict(test_data[0])
             #print test_answer[0]
             db = StateModel(state_name='lock_model', status=0)
@@ -407,7 +411,7 @@ def auth_and_login(request, onsuccess='/main/train_page/', onfail='/main/login/'
     else:
         return redirect(onfail)
 
-
+@login_required(login_url='/main/login/')
 def change_password_view(request):
     return render(request, 'main_app/change_password.html')
 
