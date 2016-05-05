@@ -92,7 +92,8 @@ class AVCS:
         # neural_network.load_model(settings.STATICFILES_DIRS[0])
         lda = LDA(75, 3)
         #lda.create_struct(150)
-        lda.load_model(settings.STATICFILES_DIRS[0])
+        if mode == 'predict':
+            lda.load_model(settings.STATICFILES_DIRS[0])
         self.video.set(cv2.cv.CV_CAP_PROP_POS_MSEC, 0)
         kernel = np.ones((10, 10), np.uint8)
         lanes = [[] for x in range(self.totalLane)]
@@ -180,7 +181,7 @@ class AVCS:
                             lbp.read_image(normal_image)
                             feature = lbp.extract_feature(size_data[0], size_data[1], size_data[2])
                             #answer = neural_network.predict(feature)
-                            answer = lda.predict(feature)
+                            answer = int(lda.predict(feature))
                             save_type(self.video_name, answer, self.num_frame)
                             if answer == 2:
                                 self.typeCar["small"] += 1

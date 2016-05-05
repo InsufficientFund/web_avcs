@@ -59,8 +59,12 @@ class lbp_feature:
                 compute_pic = self.image[i, j]
                 hist, lbp = self.lbpClass.describe(compute_pic)
                 histR = hist[0:5].sum()/hist[5:10].sum()
-                hist_ratio.append(round(histR, 6))
-                hist_max.append(round(hist.max(), 6))
+                if np.isinf(histR.max()):
+                	hist_ratio.append(0.0)
+                	hist_max.append(0.0)	
+                else:
+                	hist_ratio.append(round(histR, 6))
+                	hist_max.append(round(hist.max(), 6))
         if answer == None:
             return np.hstack((hist_ratio, hist_max, height, width, area))
         else:
