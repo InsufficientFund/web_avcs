@@ -13,6 +13,7 @@ function upload(event) {
         success: function(data) {
             $('#upload_form').children().prop('disabled', false);
             $("#video_name").html(data);
+            $("#current_frame").html(0);
             select_video();
         }
     });
@@ -32,6 +33,18 @@ function select_video(){
     }).done(function(data) {
         $('#pointer_div').attr('style', 'background-image:url("/static/main_app/media/' +data+'");border:1px solid black');
         alert('ok');
+    });
+}
+
+function get_train_frame(event){
+    event.preventDefault();
+    $.ajax({
+        url: '/main/get_train_frame/',
+        data: {video_name:$("#video_name").html(), current_frame:$("#current_frame").html()},
+        contentType: "application/json",
+    }).done(function(data) {
+        $("#current_frame").html(parseInt($("#current_frame").html()) + 100);
+        $('#pointer_div').attr('style', 'background-image:url("/static/main_app/media/' +data+'");border:1px solid black');
     });
 }
 

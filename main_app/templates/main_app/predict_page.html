@@ -48,7 +48,7 @@
         <div class="main" ng-controller="MainController">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-5">
+                    <div class="col-md-5" >
                         <br>
                         <br />
                         <br />
@@ -56,6 +56,7 @@
                           <button class="btn btn-primary" onclick="window.location='/main'"> main	</button>
                           <pie-chart data="data" options="options" ng-if="has_graph_data"></pie-chart>
                           <div ng-if="!is_predicting">
+                            <hr>
                             <form enctype="multipart/form-data" method="post" action="/main/upload/" id="upload_form">
                                 {% for field in form %}
                                     <div class="fieldWrapper">
@@ -70,6 +71,8 @@
                                 <input type="submit" class="submit-post">
                             </form>
                             <br>
+                            <button class="btn btn-success" onclick="get_predict_frame(event)"> new frame </button>
+                            <hr>
                             <div class="row container-fluid">
                                 <form name="pointform" method="post">
                                     <div class="row">
@@ -82,6 +85,7 @@
                                             y =  <input type="text" id="up_right_y"  name="up_right_y" size="4" /><br>
                                         </div>
                                     </div>
+                                    <br>
                                     <div class="row">
                                         <div class="col-md-6">
                                             low left x = <input type="text" id="low_left_x"  name="low_left_x" size="4" />
@@ -101,7 +105,7 @@
                               <button type="button" class="btn btn-primary" onclick="add_lane(event)">add lane</button>
                               <button type="button" class="btn btn-danger" onclick="remove_lane(event)">clear lane</button>
                           </div>
-                          <br>
+                          <hr>
                           <div class="row container-fluid">
                               <b>EMAIL: </b><input type="text" id="email"> <button type="button" class="btn btn-primary" ng-click="send_predict($event)">predict</button>
                           </div>
@@ -111,6 +115,7 @@
                   <div class="col-md-7">
                       <br>
                       <div id="video_name" hidden></div>
+                      <div id="sample_frame" hidden></div>
                       <canvas id="pointer_div" onclick="point_it(event)" width="640" height="480"
                               style = "background-color:#6E6E6E;border:1px solid black" ng-if="!is_predicting">
                           <!--<img src="{% static 'main_app/media/tesf.png' %}" id="cross" >-->

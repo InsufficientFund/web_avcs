@@ -57,9 +57,10 @@ class AVCS:
         if event == cv2.EVENT_LBUTTONDBLCLK:
             print x, y
 
-    def sampleImage(self):
+    def sampleImage(self, frame=0):
         if self.video.isOpened():
-            self.video.set(cv2.cv.CV_CAP_PROP_POS_MSEC, 0)
+            print frame
+            self.video.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, frame)
             ret, self.sampleFrame = self.video.read()
             if ret:
                 return self.sampleFrame
@@ -94,7 +95,7 @@ class AVCS:
         #lda.create_struct(150)
         if mode == 'predict':
             lda.load_model(settings.STATICFILES_DIRS[0])
-        self.video.set(cv2.cv.CV_CAP_PROP_POS_MSEC, 0)
+        self.video.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, 0)
         kernel = np.ones((10, 10), np.uint8)
         lanes = [[] for x in range(self.totalLane)]
         totalCars = [0] * self.totalLane

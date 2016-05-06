@@ -117,6 +117,36 @@ def select_video(request):
             return HttpResponse('train_image/sample/'+frame_name)
 
 
+def get_train_frame(request):
+    if request.is_ajax():
+        if request.method == 'GET':
+            filename = request.GET['video_name']
+            current_frame = request.GET['current_frame']
+            counter = AVCS()
+            counter.readVideo(settings.STATICFILES_DIRS[0]+'main_app/media/train_video/'+filename, filename)
+            frame = counter.sampleImage(int(current_frame)+100)
+            frame_name = filename[:filename.find('.avi')] + '.png'
+            write_path = settings.STATICFILES_DIRS[0]+'main_app/media/train_image/sample/'+frame_name
+            cv2.imwrite(write_path, frame)
+            current_milli_time = lambda: int(round(time.time() * 1000))
+            return HttpResponse('train_image/sample/'+frame_name + '?' + str(current_milli_time()))
+
+
+def get_predict_frame(request):
+    if request.is_ajax():
+        if request.method == 'GET':
+            filename = request.GET['video_name']
+            current_frame = request.GET['current_frame']
+            counter = AVCS()
+            counter.readVideo(settings.MEDIA_ROOT+"upload/"+filename, filename)
+            frame = counter.sampleImage(int(current_frame)+100)
+            frame_name = filename[:filename.find('.avi')] + '.png'
+            write_path = settings.STATICFILES_DIRS[0]+'main_app/media/sample_image/'+frame_name
+            print write_path
+            cv2.imwrite(write_path, frame)
+            current_milli_time = lambda: int(round(time.time() * 1000))
+            return HttpResponse('sample_image/'+frame_name + '?' + str(current_milli_time()))
+
 def detect(request):
     if request.is_ajax():
         if request.method == 'POST':
@@ -237,7 +267,6 @@ def get_sample_frame(request):
             print write_path
             cv2.imwrite(write_path, frame)
             return HttpResponse('sample_image/'+frame_name)
-
 
 
 def predict(request):

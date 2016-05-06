@@ -26,11 +26,13 @@
                 <div class="col-md-5">
                     <a href="/main/logout/">logout</a> |
                     <a href="/main/chgpwd/">Change Password</a>
-                    <br>
+                    <hr>
                     <button class="btn btn-primary" onclick="window.location='/main'"> main	</button>
                     <!--<div><input type="text" id="video_name"></div>-->
+                    <hr>
                     <div>
                         <div hidden id="video_name"></div>
+                        <div hidden id="current_frame"></div>
                         <!-- <button type="button" class="btn btn-primary" onclick="select_video(event)">send</button> -->
                         <form enctype="multipart/form-data" method="post" action="/main/upload_train/" id="upload_form">
                             {% for field in form %}
@@ -45,8 +47,10 @@
                             {% endfor %}
                             <input type="submit" class="submit-post">
                         </form>
+                        <br>
+                        <button class="btn btn-success" onclick="get_train_frame(event)"> new frame </button>
                     </div>
-
+                    <hr>
                     <div class="row container-fluid">
                         <form name="pointform" method="post">
                             <div class="row">
@@ -59,6 +63,7 @@
                                     y =  <input type="text" id="up_right_y"  name="up_right_y" size="4" /><br>
                                 </div>
                             </div>
+                            <br>
                             <div class="row">
                                 <div class="col-md-6">
                                     low left x = <input type="text" id="low_left_x"  name="low_left_x" size="4" />
@@ -79,7 +84,7 @@
                         <button type="button" class="btn btn-danger" onclick="remove_lane(event)">clear lane</button> |||
                         <button type="button" class="btn btn-success" onclick="detect_cmd(event)">detect</button>
                     </div>
-                    <br>
+                    <hr>
                     <div class="row container-fluid">
                         <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#setCarModal">
                             detected cars

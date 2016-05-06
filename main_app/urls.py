@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'^chgpwd_opt/', views.change_password, name='change_password'),
     url(r'^chgpwd/', views.change_password_view, name='change_password_view'),
     url(r'^upload_train/', views.upload_train, name='upload_train'),
+    url(r'^get_predict_frame/', views.get_predict_frame, name='get_predict_frame'),
+    url(r'^get_train_frame/', views.get_train_frame, name='get_train_frame'),
     url(r'^$', views.index, name='index'),
 
 ]

@@ -9,6 +9,18 @@ function select_video(){
     });
 }
 
+function get_predict_frame(event){
+    event.preventDefault();
+    $.ajax({
+        url: '/main/get_predict_frame/',
+        data: {video_name:$("#video_name").html(), current_frame:$("#sample_frame").html()},
+        contentType: "application/json",
+    }).done(function(data) {
+        $("#sample_frame").html(parseInt($("#sample_frame").html()) + 100);
+        $('#pointer_div').attr('style', 'background-image:url("/static/main_app/media/' +data+'");border:1px solid black');
+    });
+}
+
 function upload(event) {
     event.preventDefault();
     var data = new FormData($('#upload_form').get(0));
@@ -24,6 +36,7 @@ function upload(event) {
         success: function(data) {
             $('#upload_form').children().prop('disabled', false);
             $("#video_name").html(data);
+            $("#sample_frame").html(0);
             select_video();
         }
     });
