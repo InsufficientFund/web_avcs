@@ -92,7 +92,7 @@ class AVCS:
         # neural_network.create_struct(150)
         # neural_network.load_model(settings.STATICFILES_DIRS[0])
         lda = LDA(75, 3)
-        #lda.create_struct(150)
+        # lda.create_struct(150)
         if mode == 'predict':
             lda.load_model(settings.STATICFILES_DIRS[0])
         self.video.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, 0)
@@ -181,7 +181,7 @@ class AVCS:
                             size_data = [height/100.0, width/100.0, height * width/10000.0]
                             lbp.read_image(normal_image)
                             feature = lbp.extract_feature(size_data[0], size_data[1], size_data[2])
-                            #answer = neural_network.predict(feature)
+                            # answer = neural_network.predict(feature)
                             answer = int(lda.predict(feature))
                             save_type(self.video_name, answer, self.num_frame)
                             if answer == 2:

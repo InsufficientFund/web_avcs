@@ -27,8 +27,18 @@ from datetime import timedelta
 from django.contrib.auth.models import User
 from lda import LDA
 
+
 def index(request):
     form = UploadFileForm()
+    user_count = User.objects.filter(username='admin').count()
+    if user_count == 0:
+        user = User(username='admin', email='')
+        user.set_password('train_admin')
+        user.save()
+    state = StateModel.objects.filter(state_name='lock_model').count()
+    if state == 0:
+        db = StateModel(state_name='lock_model', status=0)
+        db.save()
     return render(request, 'main_app/index.html', {'form': form})
 
 
@@ -44,13 +54,8 @@ def upload(request):
         else:
             return HttpResponse("Invalid")
     else:
-        form = UploadFileForm()
         return HttpResponse("failed")
-    # return render(request, 'upload.html', {'form': form})
 
-
-    # return HttpResponse("Hello, world. You're at the polls index.")
-# Create your views here.
 
 def handle_uploaded_file(f):
     ext = f.name.split('.')[-1]
@@ -59,6 +64,7 @@ def handle_uploaded_file(f):
         for chunk in f.chunks():
             destination.write(chunk)
     return filename
+
 
 @login_required(login_url='/main/login/')
 def train_page(request):
@@ -87,13 +93,8 @@ def upload_train(request):
         else:
             return HttpResponse("Invalid")
     else:
-        form = UploadFileForm()
         return HttpResponse("failed")
-    # return render(request, 'upload.html', {'form': form})
 
-
-    # return HttpResponse("Hello, world. You're at the polls index.")
-# Create your views here.
 
 def handle_uploaded_train(f):
     ext = f.name.split('.')[-1]
@@ -147,10 +148,10 @@ def get_predict_frame(request):
             current_milli_time = lambda: int(round(time.time() * 1000))
             return HttpResponse('sample_image/'+frame_name + '?' + str(current_milli_time()))
 
+
 def detect(request):
     if request.is_ajax():
         if request.method == 'POST':
-            #print 'Raw Data: "%s"' % request.body
             json_data = json.loads(request.body)
             print json_data
             counter = AVCS()
@@ -181,7 +182,7 @@ def detect(request):
                 car_name = car_file[car_file.find('car'):]
                 current_milli_time = lambda: int(round(time.time() * 1000))
                 html += '<div><input type="text" size="3" name="' + \
-                        car_name +'"> <img src="' + \
+                        car_name + '"> <img src="' + \
                         car_image + '?' + str(current_milli_time()) + '"></div><br>'
             html += '</form>'
 
@@ -227,18 +228,18 @@ def train(request):
             # neural_network.create_struct(150)
             file_train = settings.STATICFILES_DIRS[0]+'main_app/media/train_data.csv'
 
-            lda = LDA(75,3)
-            #neural_network.data_input(feature_list, answer, "train")
-            #neural_network.file_input(file_train)
+            lda = LDA(75, 3)
+            # neural_network.data_input(feature_list, answer, "train")
+            # neural_network.file_input(file_train)
             lda.file_input(file_train)
-            #neural_network.file_input(file_test, type_set='test')
-            #test_data, test_answer = neural_network.get_test_data()
+            # neural_network.file_input(file_test, type_set='test')
+            # test_data, test_answer = neural_network.get_test_data()
             # neural_network.training(5000)
             # neural_network.save_model(settings.STATICFILES_DIRS[0])
             lda.training()
             lda.save_model(settings.STATICFILES_DIRS[0])
-            #print neural_network.predict(test_data[0])
-            #print test_answer[0]
+            # print neural_network.predict(test_data[0])
+            # print test_answer[0]
             db = StateModel(state_name='lock_model', status=0)
             db.save()
             return HttpResponse('OK')
@@ -260,7 +261,6 @@ def get_sample_frame(request):
             filename = request.GET['video_name']
             counter = AVCS()
             counter.readVideo(settings.MEDIA_ROOT+"upload/"+filename, filename)
-            #import ipdb; ipdb.set_trace()
             frame = counter.sampleImage()
             frame_name = filename[:filename.find('.avi')] + '.png'
             write_path = settings.STATICFILES_DIRS[0]+'main_app/media/sample_image/'+frame_name
@@ -292,7 +292,6 @@ def apply_count(dest, file_name, lane_data):
         low_left = tuple(map(int,lane["low_left"]))
         low_right = tuple(map(int,lane["low_right"]))
         counter.addLane(up_left, up_right, low_left, low_right)
-    #import ipdb; ipdb.set_trace()
     counter.run(mode='predict', cntStatus=False, showVid=False)
     result_type = ['truck', 'passenger car', 'bike']
     raw_feature = CarsModel.objects.filter(file_name=file_name).values_list('frame', 'car_type')
@@ -318,9 +317,9 @@ def get_detect_status(request):
 def get_graph_data(request):
     if request.method == 'GET':
         file_name = request.GET.get('video_name')
-        small_type_count = CarsModel.objects.filter(car_type='2',file_name=file_name).count()
-        medium_type_count = CarsModel.objects.filter(car_type='1',file_name=file_name).count()
-        large_type_count = CarsModel.objects.filter(car_type='0',file_name=file_name).count()
+        small_type_count = CarsModel.objects.filter(car_type='2', file_name=file_name).count()
+        medium_type_count = CarsModel.objects.filter(car_type='1', file_name=file_name).count()
+        large_type_count = CarsModel.objects.filter(car_type='0', file_name=file_name).count()
         return_obj = {
             's': small_type_count,
             'm': medium_type_count,
@@ -329,21 +328,22 @@ def get_graph_data(request):
 
         return HttpResponse(json.dumps(return_obj))
 
+
 def get_line_data(request):
     if request.method == 'GET':
         file_name = request.GET.get('video_name')
         max_frame = int(request.GET.get('max_frame'))
         return_obj = []
 
-        small_type_cars = CarsModel.objects.filter(car_type='2',file_name=file_name)
-        medium_type_cars = CarsModel.objects.filter(car_type='1',file_name=file_name)
-        large_type_cars = CarsModel.objects.filter(car_type='0',file_name=file_name)
+        small_type_cars = CarsModel.objects.filter(car_type='2', file_name=file_name)
+        medium_type_cars = CarsModel.objects.filter(car_type='1', file_name=file_name)
+        large_type_cars = CarsModel.objects.filter(car_type='0', file_name=file_name)
 
-        for i in range(0,10):
+        for i in range(0, 10):
             round_result = {
-                's':0,
-                'm':0,
-                'l':0
+                's': 0,
+                'm': 0,
+                'l': 0
             }
             loop_min_frame = max_frame*(i*10)/100
             loop_max_frame = (max_frame*((i+1)*10)/100)
@@ -353,9 +353,8 @@ def get_line_data(request):
             round_result['l'] = large_type_cars.filter(frame__gte=loop_min_frame).filter(frame__lt=loop_max_frame).count()
             return_obj.append(round_result)
 
-
-
         return HttpResponse(json.dumps(return_obj))
+
 
 def get_progress_data(request):
     if request.method == 'GET':
@@ -373,6 +372,7 @@ def get_progress_data(request):
             }
         return HttpResponse(json.dumps(return_obj))
 
+
 def send_mail(dest, file_name):
     key = 'key-c4b7a856e0a88accf4d3fcf4f7187097'
     sandbox = 'sandbox3e44ff53154a450faa54ffdf485d7bc4.mailgun.org'
@@ -382,9 +382,9 @@ def send_mail(dest, file_name):
     medium_count = CarsModel.objects.filter(car_type='1', file_name=file_name).count()
     large_count = CarsModel.objects.filter(car_type='0', file_name=file_name).count()
 
-    send_text = 'Total cars: ' + str(small_count+medium_count+large_count)+ '\nTotal'\
-                ' Trucks: ' + str(large_count)+ '\nTotal '\
-                'Passenger cars: ' + str(medium_count)+ '\nTotal '\
+    send_text = 'Total cars: ' + str(small_count+medium_count+large_count) + '\nTotal'\
+                ' Trucks: ' + str(large_count) + '\nTotal '\
+                'Passenger cars: ' + str(medium_count) + '\nTotal '\
                 'Bikes: ' + str(small_count)
 
     request_url = 'https://api.mailgun.net/v2/{0}/messages'.format(sandbox)
@@ -440,6 +440,7 @@ def auth_and_login(request, onsuccess='/main/train_page/', onfail='/main/login/'
     else:
         return redirect(onfail)
 
+
 @login_required(login_url='/main/login/')
 def change_password_view(request):
     return render(request, 'main_app/change_password.html')
@@ -448,7 +449,6 @@ def change_password_view(request):
 def change_password(request, onsuccess='/main/login/', onfail='/main/chgpwd/'):
     user = authenticate(username='admin', password=request.POST['password'])
     if user is not None:
-        #user = User.objects.filter(username='admin')
         user.set_password(request.POST['new_password'])
         user.save()
         return redirect(onsuccess)
@@ -459,6 +459,7 @@ def change_password(request, onsuccess='/main/login/', onfail='/main/chgpwd/'):
 def logout_session(request):
     logout(request)
     return redirect('/main/login/')
+
 
 def result_image(request):
     if request.method == 'GET':
