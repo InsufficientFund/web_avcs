@@ -16,7 +16,6 @@ class AVCS:
         self.video = None
         self.fgMask = None
         self.sampleFrame = None
-        #self.subtractor = cv2.BackgroundSubtractorMOG(history=150, nmixtures=20, backgroundRatio=0.7, noiseSigma=25)
         self.subtractor = cv2.BackgroundSubtractorMOG2(150, 200, False)
         self.lanes = []
         self.lanesImage = []
@@ -83,16 +82,11 @@ class AVCS:
     def progress(self):
         self.timer = threading.Timer(5.0, self.progress)
         self.timer.start()
-        #print 'frame' + str(self.num_frame)
         update_progress(self.video_name, self.num_frame, self.total_frame)
 
     def run(self, mode,  cntStatus = True, saveVid = False, showVid = True ):
         lbp = lbp_feature()
-        # neural_network = neural_net(75, 3)
-        # neural_network.create_struct(150)
-        # neural_network.load_model(settings.STATICFILES_DIRS[0])
         lda = LDA(75, 3)
-        # lda.create_struct(150)
         if mode == 'predict':
             lda.load_model(settings.STATICFILES_DIRS[0])
         self.video.set(cv2.cv.CV_CAP_PROP_POS_FRAMES, 0)

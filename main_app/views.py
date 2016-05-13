@@ -2,7 +2,6 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .forms import UploadFileForm
 from django.conf import settings
-from django.core import serializers
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import cv2
@@ -10,12 +9,10 @@ import json
 import time
 from AVCS import AVCS
 from lbp_feature import lbp_feature
-from neural_net import neural_net
 from models import CarsModel
 from models import ProgressModel
 from models import ResultModel
 from models import StateModel
-from django.contrib.auth.models import User
 from save_db import save_result
 import glob
 import re
@@ -223,23 +220,12 @@ def train(request):
             print 'train func'
             db = StateModel(state_name='lock_model', status=1)
             db.save()
-
-            # neural_network = neural_net(75, 3)
-            # neural_network.create_struct(150)
             file_train = settings.STATICFILES_DIRS[0]+'main_app/media/train_data.csv'
 
             lda = LDA(75, 3)
-            # neural_network.data_input(feature_list, answer, "train")
-            # neural_network.file_input(file_train)
             lda.file_input(file_train)
-            # neural_network.file_input(file_test, type_set='test')
-            # test_data, test_answer = neural_network.get_test_data()
-            # neural_network.training(5000)
-            # neural_network.save_model(settings.STATICFILES_DIRS[0])
             lda.training()
             lda.save_model(settings.STATICFILES_DIRS[0])
-            # print neural_network.predict(test_data[0])
-            # print test_answer[0]
             db = StateModel(state_name='lock_model', status=0)
             db.save()
             return HttpResponse('OK')
@@ -306,14 +292,6 @@ def apply_count(dest, file_name, lane_data):
     return 0
 
 
-def get_detect_status(request):
-    if request.method == 'GET':
-        all_obj = CarsModel.objects.all()
-        # return_str = [str(obj) for obj in all_obj.values()]
-        return_str = serializers.serialize("json", CarsModel.objects.all())
-        return HttpResponse(return_str)
-
-
 def get_graph_data(request):
     if request.method == 'GET':
         file_name = request.GET.get('video_name')
@@ -325,7 +303,6 @@ def get_graph_data(request):
             'm': medium_type_count,
             'l': large_type_count,
         }
-
         return HttpResponse(json.dumps(return_obj))
 
 
