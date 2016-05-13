@@ -1,8 +1,9 @@
+from sklearn.preprocessing import LabelEncoder
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as scikit_LDA
 import numpy as np
 import pandas as pd
+from pandas_confusion import ConfusionMatrix
 from sklearn.externals import joblib
-
 
 class LDA:
     def __init__(self, num_feature, num_class ):
